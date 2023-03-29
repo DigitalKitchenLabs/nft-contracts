@@ -31,11 +31,19 @@ where
             name: msg.name,
             symbol: msg.symbol,
         };
+
         self.contract_info.save(deps.storage, &info)?;
 
-        cw_ownable::initialize_owner(deps.storage, deps.api, Some(&msg.minter))?;
+        let minter = deps.api.addr_validate(&msg.minter)?;
 
-        Ok(Response::default())
+        self.minter.save(deps.storage, &minter)?;
+        
+        cw_ownable::initialize_owner(deps.storage, deps.api, Some(&minter.to_string()))?;
+
+        Ok(Response::default()
+            .add_attribute("action", "instantiate")
+            .add_attribute("contract_name", CONTRACT_NAME)
+            .add_attribute("contract_version", CONTRACT_VERSION))
     }
 
     pub fn execute(
