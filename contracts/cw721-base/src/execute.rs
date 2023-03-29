@@ -31,14 +31,9 @@ where
             name: msg.name,
             symbol: msg.symbol,
         };
-
         self.contract_info.save(deps.storage, &info)?;
 
-        let minter = deps.api.addr_validate(&msg.minter)?;
-
-        self.minter.save(deps.storage, &minter)?;
-        
-        cw_ownable::initialize_owner(deps.storage, deps.api, Some(&minter.to_string()))?;
+        cw_ownable::initialize_owner(deps.storage, deps.api, Some(&msg.minter))?;
 
         Ok(Response::default()
             .add_attribute("action", "instantiate")

@@ -5,8 +5,8 @@ members = ["packages/*", "contracts/*"]
 version       = "0.17.0"
 edition       = "2021"
 license       = "Apache-2.0"
-repository    = "https://github.com/CosmWasm/cw-nfts"
-homepage      = "https://cosmwasm.com"
+repository = "https://github.com/DigitalKitchenLabs/nft-contracts"
+homepage = "https://coolcat.space"
 documentation = "https://docs.cosmwasm.com"
 rust-version  = "1.65"
 
