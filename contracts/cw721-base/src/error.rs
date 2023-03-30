@@ -1,6 +1,7 @@
 use cosmwasm_std::StdError;
 use cw_ownable::OwnershipError;
 use thiserror::Error;
+use url::ParseError;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum ContractError {
@@ -10,6 +11,9 @@ pub enum ContractError {
     #[error(transparent)]
     Ownership(#[from] OwnershipError),
 
+    #[error("{0}")]
+    Parse(#[from] ParseError),
+    
     #[error("token_id already claimed")]
     Claimed {},
 
@@ -21,4 +25,10 @@ pub enum ContractError {
 
     #[error("found version ({0}) while attempting to migrate from 0.16.0")]
     WrongMigrateVersion(String),
+
+    #[error("Description of collection is too long")]
+    DescriptionTooLong {},
+
+    #[error("Invalid Royalties")]
+    InvalidRoyalties {},
 }

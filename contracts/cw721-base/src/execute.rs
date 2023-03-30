@@ -2,16 +2,19 @@ use cw_ownable::OwnershipError;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Decimal};
 
 use cw2::{get_contract_version, set_contract_version, ContractVersion};
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
+use url::Url;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, RoyaltyInfo, CollectionInfo};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 use crate::upgrades;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};
+
+const MAX_DESCRIPTION_LENGTH: u32 = 512;
 
 impl<'a, T, C, E, Q> Cw721Contract<'a, T, C, E, Q>
 where
@@ -26,19 +29,55 @@ where
         _env: Env,
         _info: MessageInfo,
         msg: InstantiateMsg,
-    ) -> StdResult<Response<C>> {
+    ) -> Result<Response<C>, ContractError> {
+
         let info = ContractInfoResponse {
             name: msg.name,
             symbol: msg.symbol,
         };
+
         self.contract_info.save(deps.storage, &info)?;
 
         cw_ownable::initialize_owner(deps.storage, deps.api, Some(&msg.minter))?;
 
+        let image = Url::parse(&msg.collection_info.image)?;
+
+
+        if let Some(ref external_link) = msg.collection_info.external_link {
+            Url::parse(external_link)?;
+        }
+
+        if msg.collection_info.description.len() > MAX_DESCRIPTION_LENGTH as usize {
+            return Err(ContractError::DescriptionTooLong {});
+        }
+
+        let royalty_info: Option<RoyaltyInfo> = match msg.collection_info.royalty_info {
+            Some(royalty_info) => Some(RoyaltyInfo {
+                payment_address: deps.api.addr_validate(&royalty_info.payment_address)?,
+                share: share_validate(royalty_info.share)?,
+            }),
+            None => None,
+        };
+
+        deps.api.addr_validate(&msg.collection_info.creator)?;
+
+        let collection_info = CollectionInfo {
+            creator: msg.collection_info.creator,
+            description: msg.collection_info.description,
+            image: msg.collection_info.image,
+            external_link: msg.collection_info.external_link,
+            explicit_content: msg.collection_info.explicit_content,
+            royalty_info,
+        };
+
+        self.collection_info.save(deps.storage, &collection_info)?;
+
         Ok(Response::default()
             .add_attribute("action", "instantiate")
             .add_attribute("contract_name", CONTRACT_NAME)
-            .add_attribute("contract_version", CONTRACT_VERSION))
+            .add_attribute("contract_version", CONTRACT_VERSION)
+            .add_attribute("collection_name", info.name)
+            .add_attribute("collection_image", image.to_string()))
     }
 
     pub fn execute(
@@ -428,4 +467,13 @@ where
             None => Err(ContractError::Ownership(OwnershipError::NotOwner)),
         }
     }
+
+}
+
+pub fn share_validate(share: Decimal) -> Result<Decimal, ContractError> {
+    if share > Decimal::one() {
+        return Err(ContractError::InvalidRoyalties {});
+    }
+
+    Ok(share)
 }

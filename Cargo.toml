@@ -14,9 +14,7 @@ rust-version  = "1.65"
 cosmwasm-schema = "1.2.1"
 cosmwasm-std    = "1.2.1"
 cw2             = "1.0.1"
-cw20            = "1.0.1"
 cw721           = { version = "0.17.0", path = "./packages/cw721" }
-cw721-base      = { version = "0.17.0", path = "./contracts/cw721-base" }
 cw721-base-016  = { version = "0.16.0", package = "cw721-base" }
 cw-multi-test   = "0.16.2"
 cw-ownable      = "0.5.0"
@@ -25,6 +23,7 @@ cw-utils        = "1.0.1"
 schemars        = "0.8.11"
 serde           = { version = "1.0.152", default-features = false, features = ["derive"] }
 thiserror       = "1.0.38"
+url             = "2.3.1"
 
 [profile.release.package.cw721-base]
 codegen-units = 1

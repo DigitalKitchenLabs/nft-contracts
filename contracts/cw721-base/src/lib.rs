@@ -46,7 +46,7 @@ pub mod entry {
         env: Env,
         info: MessageInfo,
         msg: InstantiateMsg,
-    ) -> StdResult<Response> {
+    ) -> Result<Response, ContractError> {
         cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
         let tract = Cw721Contract::<Extension, Empty, Empty, Empty>::default();
@@ -81,6 +81,8 @@ mod tests {
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cw2::ContractVersion;
 
+    use crate::msg::CollectionInfo;
+
     use super::*;
 
     /// Make sure cw2 version info is properly initialized during instantiation.
@@ -95,7 +97,15 @@ mod tests {
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),
-                minter: "larry".into(),
+                minter: "cats".into(),
+                collection_info: CollectionInfo {
+                    creator: "creator".into(),
+                    description: "description".into(),
+                    image: "https://example.com/image.png".into(),
+                    external_link: None,
+                    explicit_content: None,
+                    royalty_info: None,
+                },
             },
         )
         .unwrap();

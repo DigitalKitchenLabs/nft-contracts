@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::Binary;
+use cosmwasm_std::{Binary, Decimal, Addr};
 use cw721::Expiration;
 use cw_ownable::{cw_ownable_execute, cw_ownable_query};
 use schemars::JsonSchema;
@@ -15,6 +15,51 @@ pub struct InstantiateMsg {
     /// This is designed for a base NFT that is controlled by an external program
     /// or contract. You will likely replace this with custom logic in custom NFTs
     pub minter: String,
+
+    //Info of collection to be kept on chain
+    pub collection_info: CollectionInfo<RoyaltyInfoResponse>,
+}
+
+
+#[cw_serde]
+pub struct CollectionInfo<T> {
+    pub creator: String,
+    pub description: String,
+    pub image: String,
+    pub external_link: Option<String>,
+    pub explicit_content: Option<bool>,
+    pub royalty_info: Option<T>,
+}
+
+#[cw_serde]
+pub struct UpdateCollectionInfoMsg<T> {
+    pub description: Option<String>,
+    pub image: Option<String>,
+    pub external_link: Option<Option<String>>,
+    pub explicit_content: Option<bool>,
+    pub royalty_info: Option<Option<T>>,
+}
+
+#[cw_serde]
+pub struct RoyaltyInfo {
+    pub payment_address: Addr,
+    pub share: Decimal,
+}
+
+// allows easy conversion from RoyaltyInfo to RoyaltyInfoResponse
+impl RoyaltyInfo {
+    pub fn to_response(&self) -> RoyaltyInfoResponse {
+        RoyaltyInfoResponse {
+            payment_address: self.payment_address.to_string(),
+            share: self.share,
+        }
+    }
+}
+
+#[cw_serde]
+pub struct RoyaltyInfoResponse {
+    pub payment_address: String,
+    pub share: Decimal,
 }
 
 /// This is like Cw721ExecuteMsg but we add a Mint command for an owner

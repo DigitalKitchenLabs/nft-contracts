@@ -11,6 +11,7 @@ use cw721::{
 };
 use cw_ownable::OwnershipError;
 
+use crate::msg::CollectionInfo;
 use crate::{
     ContractError, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg,
 };
@@ -25,6 +26,14 @@ fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty,
         name: CONTRACT_NAME.to_string(),
         symbol: SYMBOL.to_string(),
         minter: String::from(MINTER),
+        collection_info: CollectionInfo {
+            creator: "creator".into(),
+            description: "description".into(),
+            image: "https://example.com/image.png".into(),
+            external_link: None,
+            explicit_content: None,
+            royalty_info: None,
+        },
     };
     let info = mock_info("creator", &[]);
     let res = contract.instantiate(deps, mock_env(), info, msg).unwrap();
@@ -41,6 +50,14 @@ fn proper_instantiation() {
         name: CONTRACT_NAME.to_string(),
         symbol: SYMBOL.to_string(),
         minter: String::from(MINTER),
+        collection_info: CollectionInfo {
+            creator: "creator".into(),
+            description: "description".into(),
+            image: "https://example.com/image.png".into(),
+            external_link: None,
+            explicit_content: None,
+            royalty_info: None,
+        },
     };
     let info = mock_info("creator", &[]);
 

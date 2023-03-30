@@ -34,6 +34,7 @@ cw721-base-016  = { workspace = true, features = ["library"] }
 schemars        = { workspace = true }
 serde           = { workspace = true }
 thiserror       = { workspace = true }
+url = { workspace = true }
 
 [dev-dependencies]
 cw-multi-test   = { workspace = true }
