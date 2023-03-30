@@ -199,6 +199,10 @@ pub enum QueryMsg<Q: JsonSchema> {
     #[returns(MinterResponse)]
     Minter {},
 
+    /// Return collection info
+    #[returns(CollectionInfoResponse)]
+    CollectionInfo {},
+
     /// Extension query
     #[returns(())]
     Extension { msg: Q },
@@ -208,4 +212,14 @@ pub enum QueryMsg<Q: JsonSchema> {
 #[cw_serde]
 pub struct MinterResponse {
     pub minter: Option<String>,
+}
+
+#[cw_serde]
+pub struct CollectionInfoResponse {
+    pub creator: String,
+    pub description: String,
+    pub image: String,
+    pub external_link: Option<String>,
+    pub explicit_content: Option<bool>,
+    pub royalty_info: Option<RoyaltyInfoResponse>,
 }

@@ -11,7 +11,7 @@ use cw721::{
 };
 use cw_ownable::OwnershipError;
 
-use crate::msg::CollectionInfo;
+use crate::msg::{CollectionInfo, CollectionInfoResponse};
 use crate::{
     ContractError, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg,
 };
@@ -929,4 +929,25 @@ fn query_tokens_by_owner() {
         .tokens(deps.as_ref(), demeter, Some(by_demeter[0].clone()), Some(3))
         .unwrap();
     assert_eq!(&by_demeter[1..], &tokens.tokens[..]);
+}
+
+#[test]
+fn query_collection_info() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let collection_info: CollectionInfoResponse = from_binary(
+        &contract
+            .query(deps.as_ref(), mock_env(), QueryMsg::CollectionInfo {})
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(collection_info, CollectionInfoResponse {
+        creator: "creator".into(),
+        description: "description".into(),
+        image: "https://example.com/image.png".into(),
+        external_link: None,
+        explicit_content: None,
+        royalty_info: None,
+    });
 }

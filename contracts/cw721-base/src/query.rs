@@ -13,7 +13,7 @@ use cw721::{
 use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
-use crate::msg::{MinterResponse, QueryMsg};
+use crate::msg::{MinterResponse, QueryMsg, CollectionInfoResponse, RoyaltyInfoResponse};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;
@@ -319,6 +319,7 @@ where
                 to_binary(&self.approvals(deps, env, token_id, include_expired.unwrap_or(false))?)
             }
             QueryMsg::Ownership {} => to_binary(&Self::ownership(deps)?),
+            QueryMsg::CollectionInfo {} => to_binary(&self.collection_info(deps)?),
             QueryMsg::Extension { msg: _ } => Ok(Binary::default()),
         }
     }
@@ -333,6 +334,27 @@ where
 
     pub fn ownership(deps: Deps) -> StdResult<cw_ownable::Ownership<Addr>> {
         cw_ownable::get_ownership(deps.storage)
+    }
+
+    fn collection_info(&self, deps: Deps) -> StdResult<CollectionInfoResponse>{
+        let info = self.collection_info.load(deps.storage)?;
+
+        let royalty_info_res: Option<RoyaltyInfoResponse> = match info.royalty_info {
+            Some(royalty_info) => Some(RoyaltyInfoResponse {
+                payment_address: royalty_info.payment_address.to_string(),
+                share: royalty_info.share,
+            }),
+            None => None,
+        };
+
+        Ok(CollectionInfoResponse {
+            creator: info.creator,
+            description: info.description,
+            image: info.image,
+            external_link: info.external_link,
+            explicit_content: info.explicit_content,
+            royalty_info: royalty_info_res,
+        })
     }
 }
 

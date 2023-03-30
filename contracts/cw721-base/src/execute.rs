@@ -71,6 +71,7 @@ where
         };
 
         self.collection_info.save(deps.storage, &collection_info)?;
+        self.frozen_collection_info.save(deps.storage, &false)?;
 
         Ok(Response::default()
             .add_attribute("action", "instantiate")

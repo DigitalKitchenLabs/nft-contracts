@@ -29,6 +29,9 @@ pub enum ContractError {
     #[error("Description of collection is too long")]
     DescriptionTooLong {},
 
+    #[error("CollectionInfoFrozen")]
+    CollectionInfoFrozen {},
+    
     #[error("Invalid Royalties")]
     InvalidRoyalties {},
 }
