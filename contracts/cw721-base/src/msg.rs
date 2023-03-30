@@ -113,8 +113,10 @@ pub enum ExecuteMsg<T, E> {
     Burn { token_id: String },
 
     // Update collection information
-
     UpdateCollectionInfo { collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse>},
+
+    // Freeze collection information
+    FreezeCollectionInfo {},
 
     /// Extension msg
     Extension { msg: E },

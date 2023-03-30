@@ -1016,3 +1016,44 @@ fn update_collection() {
 
     assert_eq!(err, ContractError::Unauthorized {})
 }
+
+#[test]
+fn freeze_collection() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+    let allowed = mock_info("creator", &[]);
+
+    let freeze_msg = ExecuteMsg::FreezeCollectionInfo { };
+
+    let _ = contract
+        .execute(
+            deps.as_mut(),
+            mock_env(),
+            allowed.clone(),
+            freeze_msg.clone(),
+        )
+        .unwrap();
+
+    let new_collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse> =
+        UpdateCollectionInfoMsg {
+            description: Some("description_new".into()),
+            image: Some("https://example-new.com/image.png".into()),
+            external_link: None,
+            explicit_content: None,
+            royalty_info: None,
+        };
+
+    let update_collection_info_msg = ExecuteMsg::UpdateCollectionInfo {
+        collection_info: new_collection_info,
+    };
+    let err = contract
+        .execute(
+            deps.as_mut(),
+            mock_env(),
+            allowed,
+            update_collection_info_msg,
+        )
+        .unwrap_err();
+
+    assert_eq!(err, ContractError::CollectionInfoFrozen {})
+}

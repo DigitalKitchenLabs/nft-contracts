@@ -2,14 +2,14 @@ use cw_ownable::OwnershipError;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Decimal, Event};
+use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Decimal, Event, StdResult};
 
 use cw2::{get_contract_version, set_contract_version, ContractVersion};
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
 use url::Url;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, RoyaltyInfo, CollectionInfo, UpdateCollectionInfoMsg, RoyaltyInfoResponse};
+use crate::msg::{ExecuteMsg, InstantiateMsg, RoyaltyInfo, CollectionInfo, UpdateCollectionInfoMsg, RoyaltyInfoResponse, CollectionInfoResponse};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 use crate::upgrades;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};
@@ -119,6 +119,9 @@ where
             ExecuteMsg::Burn { token_id } => self.burn(deps, env, info, token_id),
             ExecuteMsg::UpdateCollectionInfo { collection_info } => {
                 self.update_collection_info(deps, env, info, collection_info)
+            },
+            ExecuteMsg::FreezeCollectionInfo {} => {
+                self.freeze_collection_info(deps, env, info)
             },
             ExecuteMsg::UpdateOwnership(action) => Self::update_ownership(deps, env, info, action),
             ExecuteMsg::Extension { msg: _ } => Ok(Response::default()),
@@ -263,6 +266,44 @@ where
 
         let event = Event::new("update_collection_info").add_attribute("sender", info.sender);
         Ok(Response::new().add_event(event))
+    }
+
+    fn freeze_collection_info(
+        &self,
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+    ) -> Result<Response<C>, ContractError> {
+        let collection = self.query_collection_info(deps.as_ref())?;
+        if collection.creator != info.sender {
+            return Err(ContractError::Unauthorized {});
+        }
+
+        let frozen = true;
+        self.frozen_collection_info.save(deps.storage, &frozen)?;
+        let event = Event::new("freeze_collection").add_attribute("sender", info.sender);
+        Ok(Response::new().add_event(event))
+    }
+
+    fn query_collection_info(&self, deps: Deps) -> StdResult<CollectionInfoResponse> {
+        let info = self.collection_info.load(deps.storage)?;
+
+        let royalty_info_res: Option<RoyaltyInfoResponse> = match info.royalty_info {
+            Some(royalty_info) => Some(RoyaltyInfoResponse {
+                payment_address: royalty_info.payment_address.to_string(),
+                share: royalty_info.share,
+            }),
+            None => None,
+        };
+
+        Ok(CollectionInfoResponse {
+            creator: info.creator,
+            description: info.description,
+            image: info.image,
+            external_link: info.external_link,
+            explicit_content: info.explicit_content,
+            royalty_info: royalty_info_res,
+        })
     }
 }
 
