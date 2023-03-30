@@ -1,4 +1,4 @@
-# Cw721 Basic
+# Cw721
 
 This is a basic implementation of a cw721 NFT contract adding collection info to be kept on-chain, similar to SG721 (Stargaze). It implements
 the [CW721 spec](../../packages/cw721/README.md) plus Collection Information and is designed to
