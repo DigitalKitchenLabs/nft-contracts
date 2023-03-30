@@ -11,7 +11,9 @@ use cw721::{
 };
 use cw_ownable::OwnershipError;
 
-use crate::msg::{CollectionInfo, CollectionInfoResponse};
+use crate::msg::{
+    CollectionInfo, CollectionInfoResponse, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+};
 use crate::{
     ContractError, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg,
 };
@@ -942,12 +944,75 @@ fn query_collection_info() {
             .unwrap(),
     )
     .unwrap();
-    assert_eq!(collection_info, CollectionInfoResponse {
-        creator: "creator".into(),
-        description: "description".into(),
-        image: "https://example.com/image.png".into(),
-        external_link: None,
-        explicit_content: None,
-        royalty_info: None,
-    });
+    assert_eq!(
+        collection_info,
+        CollectionInfoResponse {
+            creator: "creator".into(),
+            description: "description".into(),
+            image: "https://example.com/image.png".into(),
+            external_link: None,
+            explicit_content: None,
+            royalty_info: None,
+        }
+    );
+}
+
+#[test]
+fn update_collection() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let new_collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse> =
+        UpdateCollectionInfoMsg {
+            description: Some("description_new".into()),
+            image: Some("https://example-new.com/image.png".into()),
+            external_link: None,
+            explicit_content: None,
+            royalty_info: None,
+        };
+
+    let update_collection_info_msg = ExecuteMsg::UpdateCollectionInfo {
+        collection_info: new_collection_info,
+    };
+
+    let allowed = mock_info("creator", &[]);
+    let _ = contract
+        .execute(
+            deps.as_mut(),
+            mock_env(),
+            allowed.clone(),
+            update_collection_info_msg.clone(),
+        )
+        .unwrap();
+
+    let collection_info: CollectionInfoResponse = from_binary(
+        &contract
+            .query(deps.as_ref(), mock_env(), QueryMsg::CollectionInfo {})
+            .unwrap(),
+    )
+    .unwrap();
+
+    assert_eq!(
+        collection_info,
+        CollectionInfoResponse {
+            creator: "creator".into(),
+            description: "description_new".into(),
+            image: "https://example-new.com/image.png".into(),
+            external_link: None,
+            explicit_content: None,
+            royalty_info: None,
+        }
+    );
+
+    let not_allowed = mock_info("not_creator", &[]);
+    let err = contract
+        .execute(
+            deps.as_mut(),
+            mock_env(),
+            not_allowed.clone(),
+            update_collection_info_msg,
+        )
+        .unwrap_err();
+
+    assert_eq!(err, ContractError::Unauthorized {})
 }

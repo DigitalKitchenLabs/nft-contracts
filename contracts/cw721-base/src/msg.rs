@@ -112,6 +112,10 @@ pub enum ExecuteMsg<T, E> {
     /// Burn an NFT the sender has access to
     Burn { token_id: String },
 
+    // Update collection information
+
+    UpdateCollectionInfo { collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse>},
+
     /// Extension msg
     Extension { msg: E },
 }

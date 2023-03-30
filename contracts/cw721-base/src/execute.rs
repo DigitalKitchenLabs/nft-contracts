@@ -2,14 +2,14 @@ use cw_ownable::OwnershipError;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Decimal};
+use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Decimal, Event};
 
 use cw2::{get_contract_version, set_contract_version, ContractVersion};
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
 use url::Url;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, RoyaltyInfo, CollectionInfo};
+use crate::msg::{ExecuteMsg, InstantiateMsg, RoyaltyInfo, CollectionInfo, UpdateCollectionInfoMsg, RoyaltyInfoResponse};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 use crate::upgrades;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};
@@ -117,6 +117,9 @@ where
                 msg,
             } => self.send_nft(deps, env, info, contract, token_id, msg),
             ExecuteMsg::Burn { token_id } => self.burn(deps, env, info, token_id),
+            ExecuteMsg::UpdateCollectionInfo { collection_info } => {
+                self.update_collection_info(deps, env, info, collection_info)
+            },
             ExecuteMsg::UpdateOwnership(action) => Self::update_ownership(deps, env, info, action),
             ExecuteMsg::Extension { msg: _ } => Ok(Response::default()),
         }
@@ -185,6 +188,81 @@ where
         } else {
             upgrades::v0_16::migrate::<T, C, E, Q>(deps)
         }
+    }
+
+    fn update_collection_info(
+        &self,
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+        collection_msg: UpdateCollectionInfoMsg<RoyaltyInfoResponse>,
+    ) -> Result<Response<C>, ContractError> {
+        let mut collection = self.collection_info.load(deps.storage)?;
+
+        if self.frozen_collection_info.load(deps.storage)? {
+            return Err(ContractError::CollectionInfoFrozen {});
+        }
+
+        // only creator can update collection info
+        if collection.creator != info.sender {
+            return Err(ContractError::Unauthorized {});
+        }
+
+        collection.description = collection_msg
+            .description
+            .unwrap_or_else(|| collection.description.to_string());
+        if collection.description.len() > MAX_DESCRIPTION_LENGTH as usize {
+            return Err(ContractError::DescriptionTooLong {});
+        }
+
+        collection.image = collection_msg
+            .image
+            .unwrap_or_else(|| collection.image.to_string());
+        Url::parse(&collection.image)?;
+
+        collection.external_link = collection_msg
+            .external_link
+            .unwrap_or_else(|| collection.external_link.as_ref().map(|s| s.to_string()));
+        if collection.external_link.as_ref().is_some() {
+            Url::parse(collection.external_link.as_ref().unwrap())?;
+        }
+
+        collection.explicit_content = collection_msg.explicit_content;
+
+        // convert collection royalty info to response for comparison
+        // convert from response to royalty info for storage
+        let current_royalty_info = collection
+            .royalty_info
+            .as_ref()
+            .map(|royalty_info| royalty_info.to_response());
+
+        let new_royalty_info = collection_msg
+            .royalty_info
+            .unwrap_or_else(|| current_royalty_info.clone());
+
+        // reminder: collection_msg.royalty_info is Option<Option<RoyaltyInfoResponse>>
+        collection.royalty_info = if let Some(royalty_info) = new_royalty_info {
+            // update royalty info to equal or less, else throw error
+            if let Some(royalty_info_res) = current_royalty_info {
+                if royalty_info.share > royalty_info_res.share {
+                    return Err(ContractError::RoyaltyShareIncreased {});
+                }
+            } else {
+                return Err(ContractError::RoyaltyShareIncreased {});
+            }
+
+            Some(RoyaltyInfo {
+                payment_address: deps.api.addr_validate(&royalty_info.payment_address)?,
+                share: share_validate(royalty_info.share)?,
+            })
+        } else {
+            None
+        };
+
+        self.collection_info.save(deps.storage, &collection)?;
+
+        let event = Event::new("update_collection_info").add_attribute("sender", info.sender);
+        Ok(Response::new().add_event(event))
     }
 }
 
@@ -336,6 +414,7 @@ where
             .add_attribute("sender", info.sender)
             .add_attribute("token_id", token_id))
     }
+    
 }
 
 // helpers

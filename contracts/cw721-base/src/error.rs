@@ -31,7 +31,13 @@ pub enum ContractError {
 
     #[error("CollectionInfoFrozen")]
     CollectionInfoFrozen {},
-    
+
     #[error("Invalid Royalties")]
     InvalidRoyalties {},
+
+    #[error("Unauthorized")]
+    Unauthorized {},
+
+    #[error("RoyaltyShareIncreased")]
+    RoyaltyShareIncreased {},
 }
