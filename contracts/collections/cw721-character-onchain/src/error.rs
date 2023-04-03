@@ -41,7 +41,7 @@ pub enum ContractError {
     #[error("RoyaltyShareIncreased")]
     RoyaltyShareIncreased {},
 
-    #[error("Character is frozen")]
-    CharacterFrozen {},
+    #[error("Character is not frozen")]
+    CharacterNotFrozen {},
 
 }

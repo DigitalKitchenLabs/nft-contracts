@@ -389,7 +389,7 @@ fn transferring_nft() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            frozen: true,
         },
     };
 
@@ -452,7 +452,7 @@ fn sending_nft() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            frozen: true,
         },
     };
 
@@ -504,6 +504,48 @@ fn sending_nft() {
             .add_attribute("recipient", "another_contract")
             .add_attribute("token_id", token_id)
     );
+
+    //Can't send unfrozen character
+
+    // Mint a token
+    let token_id2 = "Cat2".to_string();
+    let demeter2 = String::from("keyne");
+
+    let mint_msg2 = ExecuteMsg::Mint {
+        token_id: token_id2.clone(),
+        owner: demeter2.clone(),
+        token_uri: None,
+        extension: Metadata {
+            name: String::from("Cat1"),
+            ears: Some(String::from("Stiff")),
+            eyes: Some(String::from("Aviator")),
+            mouth: Some(String::from("Cool")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
+        },
+    };
+
+    let minter = mock_info(MINTER, &[]);
+    contract
+        .execute(deps.as_mut(), mock_env(), minter, mint_msg2)
+        .unwrap();
+
+    let msg2 = to_binary("You now have the ultra coolcat").unwrap();
+    let target2 = String::from("another_contract");
+    let send_msg2 = ExecuteMsg::SendNft {
+        contract: target2.clone(),
+        token_id: token_id2.clone(),
+        msg: msg2.clone(),
+    };
+
+    let realowner = mock_info("keyne", &[]);
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), realowner, send_msg2.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::CharacterNotFrozen {});
+
 }
 
 #[test]
@@ -527,7 +569,7 @@ fn approving_revoking() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            frozen: true,
         },
     };
 
@@ -680,7 +722,7 @@ fn approving_all_revoking_all() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            frozen: true,
         },
     };
 
@@ -705,7 +747,7 @@ fn approving_all_revoking_all() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            frozen: true,
         },
     };
 

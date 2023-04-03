@@ -8,7 +8,6 @@ use cosmwasm_std::{Addr, BlockInfo, CustomMsg, StdResult, Storage};
 use cw721::{ContractInfoResponse, Expiration};
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
-use crate::Cw721CharacterContract;
 use crate::msg::{CollectionInfo, RoyaltyInfo};
 
 pub struct Cw721Contract<'a, T, C, E, Q>
@@ -28,11 +27,6 @@ where
     pub(crate) _custom_response: PhantomData<C>,
     pub(crate) _custom_query: PhantomData<Q>,
     pub(crate) _custom_execute: PhantomData<E>,
-}
-
-// This is a signal, the implementations are in other files
-impl Cw721CharacterContract<'_>
-{
 }
 
 impl<T, C, E, Q> Default for Cw721Contract<'static, T, C, E, Q>

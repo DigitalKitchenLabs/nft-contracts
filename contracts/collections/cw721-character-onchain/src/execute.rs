@@ -520,6 +520,12 @@ impl Cw721CharacterContract<'_>
         info: &MessageInfo,
         token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
+
+        //Ensure character is frozen
+        if token.extension.frozen == false {
+            return Err(ContractError::CharacterNotFrozen {})
+        }
+
         // owner can send
         if token.owner == info.sender {
             return Ok(());
