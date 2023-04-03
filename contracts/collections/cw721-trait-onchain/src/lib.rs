@@ -8,7 +8,6 @@ pub mod state;
 #[cfg(test)]
 mod contract_tests;
 
-pub use crate::error::ContractError;
 pub use crate::msg::{ExecuteMsg, InstantiateMsg, MinterResponse, QueryMsg};
 pub use crate::state::Cw721Contract;
 
@@ -21,15 +20,17 @@ pub use crate::state::Cw721Contract;
 pub use cw_ownable::{Action, Ownership, OwnershipError};
 
 use cosmwasm_std::Empty;
+use msg::Extension;
 
-// This is a simple type to let us handle empty extensions
-pub type Extension = Option<Empty>;
+pub type Cw721TraitContract<'a> = Cw721Contract<'a, Extension, Empty, Empty, Empty>;
 
 // Version info for migration
-pub const CONTRACT_NAME: &str = "crates.io:cw721-base";
+pub const CONTRACT_NAME: &str = "crates.io:cw721-base"; 
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub mod entry {
+    use crate::error::ContractError;
+
     use super::*;
 
     #[cfg(not(feature = "library"))]
@@ -46,7 +47,7 @@ pub mod entry {
     ) -> Result<Response, ContractError> {
         cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-        let tract = Cw721Contract::<Extension, Empty, Empty, Empty>::default();
+        let tract = Cw721TraitContract::default();
         tract.instantiate(deps, env, info, msg)
     }
 
@@ -57,13 +58,13 @@ pub mod entry {
         info: MessageInfo,
         msg: ExecuteMsg<Extension, Empty>,
     ) -> Result<Response, ContractError> {
-        let tract = Cw721Contract::<Extension, Empty, Empty, Empty>::default();
+        let tract = Cw721TraitContract::default();
         tract.execute(deps, env, info, msg)
     }
 
     #[cfg_attr(not(feature = "library"), entry_point)]
     pub fn query(deps: Deps, env: Env, msg: QueryMsg<Empty>) -> StdResult<Binary> {
-        let tract = Cw721Contract::<Extension, Empty, Empty, Empty>::default();
+        let tract = Cw721TraitContract::default();
         tract.query(deps, env, msg)
     }
 }
@@ -85,7 +86,7 @@ mod tests {
         entry::instantiate(
             deps.as_mut(),
             mock_env(),
-            mock_info("larry", &[]),
+            mock_info("test", &[]),
             InstantiateMsg {
                 name: "".into(),
                 symbol: "".into(),

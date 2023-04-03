@@ -20,6 +20,13 @@ pub struct InstantiateMsg {
     pub collection_info: CollectionInfo<RoyaltyInfoResponse>,
 }
 
+#[cw_serde]
+pub struct Metadata {
+    pub value: Option<String>,
+}
+
+pub type Extension = Metadata;
+
 
 #[cw_serde]
 pub struct CollectionInfo<T> {
