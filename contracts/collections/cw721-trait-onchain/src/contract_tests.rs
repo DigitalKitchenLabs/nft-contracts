@@ -10,14 +10,14 @@ use crate::error::ContractError;
 use crate::msg::{
     CollectionInfo, CollectionInfoResponse, Metadata, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
-use crate::{Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg};
+use crate::{Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg, Cw721TraitContract};
 
 const MINTER: &str = "merlin";
 const CONTRACT_NAME: &str = "Magic Power";
 const SYMBOL: &str = "MGK";
 
 fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty, Empty, Empty> {
-    let contract = Cw721Contract::default();
+    let contract = Cw721TraitContract::default();
     let msg = InstantiateMsg {
         name: CONTRACT_NAME.to_string(),
         symbol: SYMBOL.to_string(),
@@ -40,7 +40,7 @@ fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty,
 #[test]
 fn proper_instantiation() {
     let mut deps = mock_dependencies();
-    let contract = Cw721Contract::<Extension, Empty, Empty, Empty>::default();
+    let contract = Cw721TraitContract::default();
 
     let msg = InstantiateMsg {
         name: CONTRACT_NAME.to_string(),
