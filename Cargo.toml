@@ -28,6 +28,10 @@ url             = "2.3.1"
 codegen-units = 1
 incremental = false
 
+[profile.release.package.cw721-trait-onchain]
+codegen-units = 1
+incremental = false
+
 [profile.release]
 rpath = false
 lto = true
