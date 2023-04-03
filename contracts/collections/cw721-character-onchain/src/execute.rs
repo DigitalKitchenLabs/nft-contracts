@@ -115,6 +115,7 @@ impl Cw721CharacterContract<'_> {
                 self.update_collection_info(deps, env, info, collection_info)
             }
             ExecuteMsg::FreezeCollectionInfo {} => self.freeze_collection_info(deps, env, info),
+            ExecuteMsg::FreezeCharacter { token_id } => self.freeze_character(deps, env, info, token_id),
             ExecuteMsg::UpdateOwnership(action) => Self::update_ownership(deps, env, info, action),
             ExecuteMsg::Extension { msg: _ } => Ok(Response::default()),
         }
@@ -410,13 +411,28 @@ impl Cw721CharacterContract<'_> {
         token_id: String,
     ) -> Result<Response, ContractError> {
         let token = self.tokens.load(deps.storage, &token_id)?;
-        self.check_can_burn(deps.as_ref(), &env, &info, &token)?;
+        self.check_can_burn_or_freeze(deps.as_ref(), &env, &info, &token)?;
 
         self.tokens.remove(deps.storage, &token_id)?;
         self.decrement_tokens(deps.storage)?;
 
         Ok(Response::new()
             .add_attribute("action", "burn")
+            .add_attribute("sender", info.sender)
+            .add_attribute("token_id", token_id))
+    }
+
+    fn freeze_character(
+        &self,
+        deps: DepsMut,
+        env: Env,
+        info: MessageInfo,
+        token_id: String,
+    ) -> Result<Response, ContractError> {
+        self._freeze_character(deps, &env, &info, &token_id)?;
+
+        Ok(Response::new()
+            .add_attribute("action", "freeze_character")
             .add_attribute("sender", info.sender)
             .add_attribute("token_id", token_id))
     }
@@ -438,6 +454,22 @@ impl Cw721CharacterContract<'_> {
         // set owner and remove existing approvals
         token.owner = deps.api.addr_validate(recipient)?;
         token.approvals = vec![];
+        self.tokens.save(deps.storage, token_id, &token)?;
+        Ok(token)
+    }
+
+    pub fn _freeze_character(
+        &self,
+        deps: DepsMut,
+        env: &Env,
+        info: &MessageInfo,
+        token_id: &str,
+    ) -> Result<TokenInfo<Metadata>, ContractError> {
+        let mut token = self.tokens.load(deps.storage, token_id)?;
+        // ensure we have permissions
+        self.check_can_burn_or_freeze(deps.as_ref(), env, info, &token)?;
+        // Freeze the character
+        token.extension.frozen = true;
         self.tokens.save(deps.storage, token_id, &token)?;
         Ok(token)
     }
@@ -553,7 +585,7 @@ impl Cw721CharacterContract<'_> {
     }
 
     /// returns true iff the sender can burn the token
-    pub fn check_can_burn(
+    pub fn check_can_burn_or_freeze(
         &self,
         deps: Deps,
         env: &Env,

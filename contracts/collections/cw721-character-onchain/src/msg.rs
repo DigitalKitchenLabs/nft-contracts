@@ -135,6 +135,9 @@ pub enum ExecuteMsg<Metadata, E> {
     // Freeze collection information
     FreezeCollectionInfo {},
 
+    // Freeze character
+    FreezeCharacter { token_id: String },
+
     /// Extension msg
     Extension {
         msg: E,
