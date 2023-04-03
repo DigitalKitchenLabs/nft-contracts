@@ -22,9 +22,9 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub struct Metadata {
     pub name: String,
-    pub ear_type: Option<String>,
-    pub eye_type: Option<String>,
-    pub mouth_type: Option<String>,
+    pub ears: Option<String>,
+    pub eyes: Option<String>,
+    pub mouth: Option<String>,
     pub fur_type: Option<String>,
     pub fur_color: Option<String>,
     pub tail_shape: Option<String>,
