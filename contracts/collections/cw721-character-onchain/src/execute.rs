@@ -96,6 +96,27 @@ where
                 token_uri,
                 extension,
             } => self.mint(deps, info, token_id, owner, token_uri, extension),
+            ExecuteMsg::Approve {
+                spender,
+                token_id,
+                expires,
+            } => self.approve(deps, env, info, spender, token_id, expires),
+            ExecuteMsg::Revoke { spender, token_id } => {
+                self.revoke(deps, env, info, spender, token_id)
+            }
+            ExecuteMsg::ApproveAll { operator, expires } => {
+                self.approve_all(deps, env, info, operator, expires)
+            }
+            ExecuteMsg::RevokeAll { operator } => self.revoke_all(deps, env, info, operator),
+            ExecuteMsg::TransferNft {
+                recipient,
+                token_id,
+            } => self.transfer_nft(deps, env, info, recipient, token_id),
+            ExecuteMsg::SendNft {
+                contract,
+                token_id,
+                msg,
+            } => self.send_nft(deps, env, info, contract, token_id, msg),
             ExecuteMsg::Burn { token_id } => self.burn(deps, env, info, token_id),
             ExecuteMsg::UpdateCollectionInfo { collection_info } => {
                 self.update_collection_info(deps, env, info, collection_info)
