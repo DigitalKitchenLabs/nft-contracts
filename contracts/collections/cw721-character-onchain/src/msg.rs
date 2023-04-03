@@ -21,7 +21,14 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub struct Metadata {
-    pub value: Option<String>,
+    pub name: String,
+    pub level: u32,
+    pub ear_type: Option<String>,
+    pub glasses: Option<String>,
+    pub fur_type: Option<String>,
+    pub fur_color: Option<String>,
+    pub facial_expression: Option<String>,
+    pub tail_shape: Option<String>,
 }
 
 pub type Extension = Metadata;

@@ -95,7 +95,14 @@ fn minting() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
 
@@ -128,7 +135,14 @@ fn minting() {
         NftInfoResponse::<Extension> {
             token_uri: None,
             extension: Metadata {
-                value: Some(String::from("red"))
+                name: String::from("Cat1"),
+                level: 1,
+                ear_type: Some(String::from("Stiff")),
+                glasses: Some(String::from("Aviator")),
+                fur_type: Some(String::from("Stripes")),
+                fur_color: Some(String::from("Red")),
+                facial_expression: Some(String::from("Cool")),
+                tail_shape: Some(String::from("Heart"))
             },
         }
     );
@@ -151,7 +165,14 @@ fn minting() {
         owner: String::from("hercules"),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
 
@@ -179,7 +200,14 @@ fn test_update_minter() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
 
@@ -254,7 +282,14 @@ fn test_update_minter() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
 
@@ -282,7 +317,14 @@ fn burning() {
         owner: MINTER.to_string(),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
 
@@ -338,7 +380,14 @@ fn query_tokens_by_owner() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
     contract
@@ -350,7 +399,14 @@ fn query_tokens_by_owner() {
         owner: ceres.clone(),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
     contract
@@ -362,7 +418,14 @@ fn query_tokens_by_owner() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            value: Some(String::from("red")),
+            name: String::from("Cat1"),
+            level: 1,
+            ear_type: Some(String::from("Stiff")),
+            glasses: Some(String::from("Aviator")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            facial_expression: Some(String::from("Cool")),
+            tail_shape: Some(String::from("Heart"))
         },
     };
     contract
