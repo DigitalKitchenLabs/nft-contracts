@@ -1224,3 +1224,79 @@ fn freeze_collection() {
 
     assert_eq!(err, ContractError::CollectionInfoFrozen {})
 }
+
+#[test]
+fn modify_a_character() {
+    let mut deps = mock_dependencies();
+    let contract = setup_contract(deps.as_mut());
+
+    let token_id = "1".to_string();
+
+    let mint_msg = ExecuteMsg::Mint {
+        token_id: token_id.clone(),
+        owner: String::from("medusa"),
+        token_uri: None,
+        extension: Metadata {
+            name: String::from("Cat1"),
+            ears: Some(String::from("Stiff")),
+            eyes: Some(String::from("Aviator")),
+            mouth: Some(String::from("Cool")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
+        },
+    };
+
+    // minter can mint
+    let allowed = mock_info(MINTER, &[]);
+    let _ = contract
+        .execute(deps.as_mut(), mock_env(), allowed.clone(), mint_msg)
+        .unwrap();
+
+    let new_extension = Metadata {
+        name: String::from("Cat2"),
+        ears: Some(String::from("Stiff")),
+        eyes: Some(String::from("Aviator")),
+        mouth: Some(String::from("Cool")),
+        fur_type: Some(String::from("Stripes")),
+        fur_color: Some(String::from("Red")),
+        tail_shape: Some(String::from("Heart")),
+        frozen: false,
+    };
+
+    // minter can modify
+    let modify_msg = ExecuteMsg::Modify {
+        token_id: token_id.clone(),
+        new_values: new_extension,
+    };
+
+    let _ = contract
+        .execute(deps.as_mut(), mock_env(), allowed, modify_msg.clone())
+        .unwrap();
+
+    // obtain the token information
+    let token = contract.nft_info(deps.as_ref(), token_id).unwrap();
+
+    //Should have been modified
+    assert_eq!(
+        token.extension,
+        Metadata {
+            name: String::from("Cat2"),
+            ears: Some(String::from("Stiff")),
+            eyes: Some(String::from("Aviator")),
+            mouth: Some(String::from("Cool")),
+            fur_type: Some(String::from("Stripes")),
+            fur_color: Some(String::from("Red")),
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
+        }
+    );
+
+    // random cannot modify
+    let random = mock_info("random", &[]);
+    let err = contract
+        .execute(deps.as_mut(), mock_env(), random, modify_msg.clone())
+        .unwrap_err();
+    assert_eq!(err, ContractError::Ownership(OwnershipError::NotOwner));
+}

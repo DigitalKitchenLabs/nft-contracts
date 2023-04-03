@@ -115,15 +115,18 @@ impl Cw721CharacterContract<'_> {
                 self.update_collection_info(deps, env, info, collection_info)
             }
             ExecuteMsg::FreezeCollectionInfo {} => self.freeze_collection_info(deps, env, info),
-            ExecuteMsg::FreezeCharacter { token_id } => self.freeze_character(deps, env, info, token_id),
+            ExecuteMsg::FreezeCharacter { token_id } => {
+                self.freeze_character(deps, env, info, token_id)
+            }
+            ExecuteMsg::Modify {
+                token_id,
+                new_values,
+            } => self.modify_character(deps, info, token_id, new_values),
             ExecuteMsg::UpdateOwnership(action) => Self::update_ownership(deps, env, info, action),
             ExecuteMsg::Extension { msg: _ } => Ok(Response::default()),
         }
     }
-}
 
-// TODO pull this into some sort of trait extension??
-impl Cw721CharacterContract<'_> {
     pub fn mint(
         &self,
         deps: DepsMut,
@@ -279,9 +282,37 @@ impl Cw721CharacterContract<'_> {
             royalty_info: royalty_info_res,
         })
     }
-}
 
-impl Cw721CharacterContract<'_> {
+    fn modify_character(
+        &self,
+        deps: DepsMut,
+        info: MessageInfo,
+        token_id: String,
+        new_values: Metadata,
+    ) -> Result<Response, ContractError> {
+        cw_ownable::assert_owner(deps.storage, &info.sender)?;
+
+        // update the character
+        self.tokens
+            .update(deps.storage, &token_id, |old| match old {
+                Some(token) => {
+                    let new_token = TokenInfo {
+                        owner: token.owner,
+                        approvals: token.approvals,
+                        token_uri: token.token_uri,
+                        extension: new_values,
+                    };
+                    Ok(new_token)
+                }
+                None => Err(ContractError::CharacterNotFound {}),
+            })?;
+
+        Ok(Response::new()
+            .add_attribute("action", "modify character")
+            .add_attribute("manager", info.sender)
+            .add_attribute("token_id", token_id))
+    }
+
     fn transfer_nft(
         &self,
         deps: DepsMut,
@@ -436,10 +467,7 @@ impl Cw721CharacterContract<'_> {
             .add_attribute("sender", info.sender)
             .add_attribute("token_id", token_id))
     }
-}
-
-// helpers
-impl Cw721CharacterContract<'_> {
+    // helpers
     pub fn _transfer_nft(
         &self,
         deps: DepsMut,

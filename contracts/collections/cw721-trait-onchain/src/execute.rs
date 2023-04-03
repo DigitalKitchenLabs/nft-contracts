@@ -1,9 +1,6 @@
 use cw_ownable::OwnershipError;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
-
 use cosmwasm_std::{
-    CustomMsg, Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Response, StdResult,
+    Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Response, StdResult,
 };
 
 use cw721::{ContractInfoResponse, Expiration};
@@ -14,7 +11,7 @@ use crate::msg::{
     CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, Metadata, RoyaltyInfo,
     RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
-use crate::state::{Approval, Cw721Contract, TokenInfo};
+use crate::state::{Approval, TokenInfo};
 use crate::Cw721TraitContract;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};
 
@@ -100,10 +97,7 @@ impl Cw721TraitContract<'_> {
             ExecuteMsg::Extension { msg: _ } => Ok(Response::default()),
         }
     }
-}
 
-// TODO pull this into some sort of trait extension??
-impl Cw721TraitContract<'_> {
     pub fn mint(
         &self,
         deps: DepsMut,
@@ -259,9 +253,6 @@ impl Cw721TraitContract<'_> {
             royalty_info: royalty_info_res,
         })
     }
-}
-
-impl Cw721TraitContract<'_> {
     /*fn transfer_nft(
         &self,
         deps: DepsMut,
@@ -401,16 +392,8 @@ impl Cw721TraitContract<'_> {
             .add_attribute("sender", info.sender)
             .add_attribute("token_id", token_id))
     }
-}
 
-// helpers
-impl<'a, T, C, E, Q> Cw721Contract<'a, T, C, E, Q>
-where
-    T: Serialize + DeserializeOwned + Clone,
-    C: CustomMsg,
-    E: CustomMsg,
-    Q: CustomMsg,
-{
+    // helpers
     pub fn _transfer_nft(
         &self,
         deps: DepsMut,
@@ -418,7 +401,7 @@ where
         info: &MessageInfo,
         recipient: &str,
         token_id: &str,
-    ) -> Result<TokenInfo<T>, ContractError> {
+    ) -> Result<TokenInfo<Metadata>, ContractError> {
         let mut token = self.tokens.load(deps.storage, token_id)?;
         // ensure we have permissions
         self.check_can_send(deps.as_ref(), env, info, &token)?;
@@ -440,7 +423,7 @@ where
         // if add == false, remove. if add == true, remove then set with this expiration
         add: bool,
         expires: Option<Expiration>,
-    ) -> Result<TokenInfo<T>, ContractError> {
+    ) -> Result<TokenInfo<Metadata>, ContractError> {
         let mut token = self.tokens.load(deps.storage, token_id)?;
         // ensure we have permissions
         self.check_can_approve(deps.as_ref(), env, info, &token)?;
@@ -474,7 +457,7 @@ where
         deps: Deps,
         env: &Env,
         info: &MessageInfo,
-        token: &TokenInfo<T>,
+        token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
         // owner can approve
         if token.owner == info.sender {
@@ -502,7 +485,7 @@ where
         deps: Deps,
         env: &Env,
         info: &MessageInfo,
-        token: &TokenInfo<T>,
+        token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
         // owner can send
         if token.owner == info.sender {

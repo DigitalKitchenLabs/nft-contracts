@@ -44,4 +44,7 @@ pub enum ContractError {
     #[error("Character is not frozen")]
     CharacterNotFrozen {},
 
+    #[error("Character not found")]
+    CharacterNotFound {},
+
 }

@@ -138,6 +138,9 @@ pub enum ExecuteMsg<Metadata, E> {
     // Freeze character
     FreezeCharacter { token_id: String },
 
+    //Modify a character with new traits
+    Modify { token_id: String, new_values: Metadata},
+
     /// Extension msg
     Extension {
         msg: E,
