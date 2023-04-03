@@ -29,6 +29,7 @@ pub struct Metadata {
     pub fur_color: Option<String>,
     pub facial_expression: Option<String>,
     pub tail_shape: Option<String>,
+    pub frozen: bool,
 }
 
 pub type Extension = Metadata;

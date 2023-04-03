@@ -102,7 +102,8 @@ fn minting() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
 
@@ -142,7 +143,8 @@ fn minting() {
                 fur_type: Some(String::from("Stripes")),
                 fur_color: Some(String::from("Red")),
                 facial_expression: Some(String::from("Cool")),
-                tail_shape: Some(String::from("Heart"))
+                tail_shape: Some(String::from("Heart")),
+                frozen: false,
             },
         }
     );
@@ -172,7 +174,8 @@ fn minting() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
 
@@ -207,7 +210,8 @@ fn test_update_minter() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
 
@@ -289,7 +293,8 @@ fn test_update_minter() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
 
@@ -324,7 +329,8 @@ fn burning() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
 
@@ -387,7 +393,8 @@ fn query_tokens_by_owner() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
     contract
@@ -406,7 +413,8 @@ fn query_tokens_by_owner() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
     contract
@@ -425,7 +433,8 @@ fn query_tokens_by_owner() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             facial_expression: Some(String::from("Cool")),
-            tail_shape: Some(String::from("Heart"))
+            tail_shape: Some(String::from("Heart")),
+            frozen: false,
         },
     };
     contract
