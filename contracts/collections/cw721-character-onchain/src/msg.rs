@@ -21,7 +21,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub struct Metadata {
-    pub value: String,
+    pub value: Option<String>,
 }
 
 pub type Extension = Metadata;

@@ -1,6 +1,6 @@
 [package]
-name          = "cw721-trait-onchain"
-description   = "Implementation cw721 NFTs with the CoolCat trait information onchain"
+name          = "cw721-character-onchain"
+description   = "Implementation cw721 NFTs with the CoolCat character information onchain"
 version       = { workspace = true }
 edition       = { workspace = true }
 license       = { workspace = true }

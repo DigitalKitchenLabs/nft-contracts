@@ -286,6 +286,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw721-character-onchain"
+version = "0.17.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ownable",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw2",
+ "cw721",
+ "schemars",
+ "serde",
+ "thiserror",
+ "url",
+]
+
+[[package]]
 name = "cw721-trait-onchain"
 version = "0.17.0"
 dependencies = [
