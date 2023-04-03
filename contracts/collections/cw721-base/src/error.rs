@@ -13,7 +13,7 @@ pub enum ContractError {
 
     #[error("{0}")]
     Parse(#[from] ParseError),
-    
+
     #[error("token_id already claimed")]
     Claimed {},
 

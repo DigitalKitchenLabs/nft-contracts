@@ -25,7 +25,7 @@ use msg::Extension;
 pub type Cw721TraitContract<'a> = Cw721Contract<'a, Extension, Empty, Empty, Empty>;
 
 // Version info for migration
-pub const CONTRACT_NAME: &str = "crates.io:cw721-base"; 
+pub const CONTRACT_NAME: &str = "crates.io:cw721-base";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub mod entry {

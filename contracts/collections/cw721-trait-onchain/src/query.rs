@@ -13,7 +13,7 @@ use cw721::{
 use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
-use crate::msg::{MinterResponse, QueryMsg, CollectionInfoResponse, RoyaltyInfoResponse};
+use crate::msg::{CollectionInfoResponse, MinterResponse, QueryMsg, RoyaltyInfoResponse};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;
@@ -336,7 +336,7 @@ where
         cw_ownable::get_ownership(deps.storage)
     }
 
-    fn collection_info(&self, deps: Deps) -> StdResult<CollectionInfoResponse>{
+    fn collection_info(&self, deps: Deps) -> StdResult<CollectionInfoResponse> {
         let info = self.collection_info.load(deps.storage)?;
 
         let royalty_info_res: Option<RoyaltyInfoResponse> = match info.royalty_info {

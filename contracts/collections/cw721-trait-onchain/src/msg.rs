@@ -1,6 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Binary, Decimal, Addr};
-use cw721::Expiration;
+use cosmwasm_std::{Addr, Decimal};
 use cw_ownable::{cw_ownable_execute, cw_ownable_query};
 use schemars::JsonSchema;
 
@@ -26,7 +25,6 @@ pub struct Metadata {
 }
 
 pub type Extension = Metadata;
-
 
 #[cw_serde]
 pub struct CollectionInfo<T> {
@@ -75,33 +73,6 @@ pub struct RoyaltyInfoResponse {
 #[cw_ownable_execute]
 #[cw_serde]
 pub enum ExecuteMsg<T, E> {
-    /// Transfer is a base message to move a token to another account without triggering actions
-    TransferNft { recipient: String, token_id: String },
-    /// Send is a base message to transfer a token to a contract and trigger an action
-    /// on the receiving contract.
-    SendNft {
-        contract: String,
-        token_id: String,
-        msg: Binary,
-    },
-    /// Allows operator to transfer / send the token from the owner's account.
-    /// If expiration is set, then this allowance has a time/height limit
-    Approve {
-        spender: String,
-        token_id: String,
-        expires: Option<Expiration>,
-    },
-    /// Remove previously granted Approval
-    Revoke { spender: String, token_id: String },
-    /// Allows operator to transfer / send any token from the owner's account.
-    /// If expiration is set, then this allowance has a time/height limit
-    ApproveAll {
-        operator: String,
-        expires: Option<Expiration>,
-    },
-    /// Remove previously granted ApproveAll permission
-    RevokeAll { operator: String },
-
     /// Mint a new NFT, can only be called by the contract minter
     Mint {
         /// Unique ID of the NFT
@@ -117,16 +88,22 @@ pub enum ExecuteMsg<T, E> {
     },
 
     /// Burn an NFT the sender has access to
-    Burn { token_id: String },
+    Burn {
+        token_id: String,
+    },
 
     // Update collection information
-    UpdateCollectionInfo { collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse>},
+    UpdateCollectionInfo {
+        collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse>,
+    },
 
     // Freeze collection information
     FreezeCollectionInfo {},
 
     /// Extension msg
-    Extension { msg: E },
+    Extension {
+        msg: E,
+    },
 }
 
 #[cw_ownable_query]

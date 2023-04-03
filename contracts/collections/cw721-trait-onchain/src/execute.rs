@@ -2,13 +2,18 @@ use cw_ownable::OwnershipError;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use cosmwasm_std::{Binary, CustomMsg, Deps, DepsMut, Env, MessageInfo, Response, Decimal, Event, StdResult};
+use cosmwasm_std::{
+    Binary, CustomMsg, Decimal, Deps, DepsMut, Env, Event, MessageInfo, Response, StdResult,
+};
 
 use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
 use url::Url;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, RoyaltyInfo, CollectionInfo, UpdateCollectionInfoMsg, RoyaltyInfoResponse, CollectionInfoResponse};
+use crate::msg::{
+    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, RoyaltyInfo,
+    RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};
 
@@ -28,7 +33,6 @@ where
         _info: MessageInfo,
         msg: InstantiateMsg,
     ) -> Result<Response<C>, ContractError> {
-
         let info = ContractInfoResponse {
             name: msg.name,
             symbol: msg.symbol,
@@ -39,7 +43,6 @@ where
         cw_ownable::initialize_owner(deps.storage, deps.api, Some(&msg.minter))?;
 
         let image = Url::parse(&msg.collection_info.image)?;
-
 
         if let Some(ref external_link) = msg.collection_info.external_link {
             Url::parse(external_link)?;
@@ -93,34 +96,11 @@ where
                 token_uri,
                 extension,
             } => self.mint(deps, info, token_id, owner, token_uri, extension),
-            ExecuteMsg::Approve {
-                spender,
-                token_id,
-                expires,
-            } => self.approve(deps, env, info, spender, token_id, expires),
-            ExecuteMsg::Revoke { spender, token_id } => {
-                self.revoke(deps, env, info, spender, token_id)
-            }
-            ExecuteMsg::ApproveAll { operator, expires } => {
-                self.approve_all(deps, env, info, operator, expires)
-            }
-            ExecuteMsg::RevokeAll { operator } => self.revoke_all(deps, env, info, operator),
-            ExecuteMsg::TransferNft {
-                recipient,
-                token_id,
-            } => self.transfer_nft(deps, env, info, recipient, token_id),
-            ExecuteMsg::SendNft {
-                contract,
-                token_id,
-                msg,
-            } => self.send_nft(deps, env, info, contract, token_id, msg),
             ExecuteMsg::Burn { token_id } => self.burn(deps, env, info, token_id),
             ExecuteMsg::UpdateCollectionInfo { collection_info } => {
                 self.update_collection_info(deps, env, info, collection_info)
-            },
-            ExecuteMsg::FreezeCollectionInfo {} => {
-                self.freeze_collection_info(deps, env, info)
-            },
+            }
+            ExecuteMsg::FreezeCollectionInfo {} => self.freeze_collection_info(deps, env, info),
             ExecuteMsg::UpdateOwnership(action) => Self::update_ownership(deps, env, info, action),
             ExecuteMsg::Extension { msg: _ } => Ok(Response::default()),
         }
@@ -440,7 +420,6 @@ where
             .add_attribute("sender", info.sender)
             .add_attribute("token_id", token_id))
     }
-    
 }
 
 // helpers
@@ -573,7 +552,6 @@ where
             None => Err(ContractError::Ownership(OwnershipError::NotOwner)),
         }
     }
-
 }
 
 pub fn share_validate(share: Decimal) -> Result<Decimal, ContractError> {
