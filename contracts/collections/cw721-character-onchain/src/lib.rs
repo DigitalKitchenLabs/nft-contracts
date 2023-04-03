@@ -22,7 +22,7 @@ pub use cw_ownable::{Action, Ownership, OwnershipError};
 use cosmwasm_std::Empty;
 use msg::Extension;
 
-pub type Cw721TraitContract<'a> = Cw721Contract<'a, Extension, Empty, Empty, Empty>;
+pub type Cw721CharacterContract<'a> = Cw721Contract<'a, Extension, Empty, Empty, Empty>;
 
 // Version info for migration
 pub const CONTRACT_NAME: &str = "crates.io:cw721-base";
@@ -47,7 +47,7 @@ pub mod entry {
     ) -> Result<Response, ContractError> {
         cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-        let tract = Cw721TraitContract::default();
+        let tract = Cw721CharacterContract::default();
         tract.instantiate(deps, env, info, msg)
     }
 
@@ -58,13 +58,13 @@ pub mod entry {
         info: MessageInfo,
         msg: ExecuteMsg<Extension, Empty>,
     ) -> Result<Response, ContractError> {
-        let tract = Cw721TraitContract::default();
+        let tract = Cw721CharacterContract::default();
         tract.execute(deps, env, info, msg)
     }
 
     #[cfg_attr(not(feature = "library"), entry_point)]
     pub fn query(deps: Deps, env: Env, msg: QueryMsg<Empty>) -> StdResult<Binary> {
-        let tract = Cw721TraitContract::default();
+        let tract = Cw721CharacterContract::default();
         tract.query(deps, env, msg)
     }
 }

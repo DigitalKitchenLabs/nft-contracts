@@ -14,7 +14,7 @@ use crate::msg::{
     CollectionInfo, CollectionInfoResponse, Metadata, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
 use crate::{
-    Cw721Contract, Cw721TraitContract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
+    Cw721Contract, Cw721CharacterContract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
     QueryMsg,
 };
 
@@ -23,7 +23,7 @@ const CONTRACT_NAME: &str = "Magic Power";
 const SYMBOL: &str = "MGK";
 
 fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty, Empty, Empty> {
-    let contract = Cw721TraitContract::default();
+    let contract = Cw721CharacterContract::default();
     let msg = InstantiateMsg {
         name: CONTRACT_NAME.to_string(),
         symbol: SYMBOL.to_string(),
@@ -46,7 +46,7 @@ fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty,
 #[test]
 fn proper_instantiation() {
     let mut deps = mock_dependencies();
-    let contract = Cw721TraitContract::default();
+    let contract = Cw721CharacterContract::default();
 
     let msg = InstantiateMsg {
         name: CONTRACT_NAME.to_string(),

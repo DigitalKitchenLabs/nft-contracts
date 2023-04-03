@@ -5,9 +5,10 @@ use std::marker::PhantomData;
 
 use cosmwasm_std::{Addr, BlockInfo, CustomMsg, StdResult, Storage};
 
-use cw721::{ContractInfoResponse, Cw721, Expiration};
+use cw721::{ContractInfoResponse, Expiration};
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
+use crate::Cw721CharacterContract;
 use crate::msg::{CollectionInfo, RoyaltyInfo};
 
 pub struct Cw721Contract<'a, T, C, E, Q>
@@ -30,12 +31,7 @@ where
 }
 
 // This is a signal, the implementations are in other files
-impl<'a, T, C, E, Q> Cw721<T, C> for Cw721Contract<'a, T, C, E, Q>
-where
-    T: Serialize + DeserializeOwned + Clone,
-    C: CustomMsg,
-    E: CustomMsg,
-    Q: CustomMsg,
+impl Cw721CharacterContract<'_>
 {
 }
 

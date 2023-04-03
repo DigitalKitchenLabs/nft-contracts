@@ -1,38 +1,31 @@
 use cw_ownable::OwnershipError;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 
 use cosmwasm_std::{
-    Binary, CustomMsg, Decimal, Deps, DepsMut, Env, Event, MessageInfo, Response, StdResult,
+    Binary, Decimal, Deps, DepsMut, Env, Event, MessageInfo, Response, StdResult, Empty,
 };
 
-use cw721::{ContractInfoResponse, Cw721Execute, Cw721ReceiveMsg, Expiration};
+use cw721::{ContractInfoResponse, Cw721ReceiveMsg, Expiration};
 use url::Url;
 
 use crate::error::ContractError;
 use crate::msg::{
     CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, RoyaltyInfo,
-    RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+    RoyaltyInfoResponse, UpdateCollectionInfoMsg, Metadata,
 };
-use crate::state::{Approval, Cw721Contract, TokenInfo};
+use crate::state::{Approval, TokenInfo};
+use crate::Cw721CharacterContract;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};
 
 const MAX_DESCRIPTION_LENGTH: u32 = 512;
 
-impl<'a, T, C, E, Q> Cw721Contract<'a, T, C, E, Q>
-where
-    T: Serialize + DeserializeOwned + Clone,
-    C: CustomMsg,
-    E: CustomMsg,
-    Q: CustomMsg,
-{
+impl Cw721CharacterContract<'_> {
     pub fn instantiate(
         &self,
         deps: DepsMut,
         _env: Env,
         _info: MessageInfo,
         msg: InstantiateMsg,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         let info = ContractInfoResponse {
             name: msg.name,
             symbol: msg.symbol,
@@ -87,8 +80,8 @@ where
         deps: DepsMut,
         env: Env,
         info: MessageInfo,
-        msg: ExecuteMsg<T, E>,
-    ) -> Result<Response<C>, ContractError> {
+        msg: ExecuteMsg<Metadata, Empty>,
+    ) -> Result<Response, ContractError> {
         match msg {
             ExecuteMsg::Mint {
                 token_id,
@@ -129,12 +122,7 @@ where
 }
 
 // TODO pull this into some sort of trait extension??
-impl<'a, T, C, E, Q> Cw721Contract<'a, T, C, E, Q>
-where
-    T: Serialize + DeserializeOwned + Clone,
-    C: CustomMsg,
-    E: CustomMsg,
-    Q: CustomMsg,
+impl Cw721CharacterContract<'_>
 {
     pub fn mint(
         &self,
@@ -143,8 +131,8 @@ where
         token_id: String,
         owner: String,
         token_uri: Option<String>,
-        extension: T,
-    ) -> Result<Response<C>, ContractError> {
+        extension: Metadata,
+    ) -> Result<Response, ContractError> {
         cw_ownable::assert_owner(deps.storage, &info.sender)?;
 
         // create the token
@@ -174,7 +162,7 @@ where
         env: Env,
         info: MessageInfo,
         action: cw_ownable::Action,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         let ownership = cw_ownable::update_ownership(deps, &env.block, &info.sender, action)?;
         Ok(Response::new().add_attributes(ownership.into_attributes()))
     }
@@ -185,7 +173,7 @@ where
         _env: Env,
         info: MessageInfo,
         collection_msg: UpdateCollectionInfoMsg<RoyaltyInfoResponse>,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         let mut collection = self.collection_info.load(deps.storage)?;
 
         if self.frozen_collection_info.load(deps.storage)? {
@@ -259,7 +247,7 @@ where
         deps: DepsMut,
         _env: Env,
         info: MessageInfo,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         let collection = self.query_collection_info(deps.as_ref())?;
         if collection.creator != info.sender {
             return Err(ContractError::Unauthorized {});
@@ -293,15 +281,8 @@ where
     }
 }
 
-impl<'a, T, C, E, Q> Cw721Execute<T, C> for Cw721Contract<'a, T, C, E, Q>
-where
-    T: Serialize + DeserializeOwned + Clone,
-    C: CustomMsg,
-    E: CustomMsg,
-    Q: CustomMsg,
+impl Cw721CharacterContract<'_>
 {
-    type Err = ContractError;
-
     fn transfer_nft(
         &self,
         deps: DepsMut,
@@ -309,7 +290,7 @@ where
         info: MessageInfo,
         recipient: String,
         token_id: String,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         self._transfer_nft(deps, &env, &info, &recipient, &token_id)?;
 
         Ok(Response::new()
@@ -327,7 +308,7 @@ where
         contract: String,
         token_id: String,
         msg: Binary,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         // Transfer token
         self._transfer_nft(deps, &env, &info, &contract, &token_id)?;
 
@@ -354,7 +335,7 @@ where
         spender: String,
         token_id: String,
         expires: Option<Expiration>,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         self._update_approvals(deps, &env, &info, &spender, &token_id, true, expires)?;
 
         Ok(Response::new()
@@ -371,7 +352,7 @@ where
         info: MessageInfo,
         spender: String,
         token_id: String,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         self._update_approvals(deps, &env, &info, &spender, &token_id, false, None)?;
 
         Ok(Response::new()
@@ -388,7 +369,7 @@ where
         info: MessageInfo,
         operator: String,
         expires: Option<Expiration>,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         // reject expired data as invalid
         let expires = expires.unwrap_or_default();
         if expires.is_expired(&env.block) {
@@ -412,7 +393,7 @@ where
         _env: Env,
         info: MessageInfo,
         operator: String,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         let operator_addr = deps.api.addr_validate(&operator)?;
         self.operators
             .remove(deps.storage, (&info.sender, &operator_addr));
@@ -429,9 +410,9 @@ where
         env: Env,
         info: MessageInfo,
         token_id: String,
-    ) -> Result<Response<C>, ContractError> {
+    ) -> Result<Response, ContractError> {
         let token = self.tokens.load(deps.storage, &token_id)?;
-        self.check_can_send(deps.as_ref(), &env, &info, &token)?;
+        self.check_can_burn(deps.as_ref(), &env, &info, &token)?;
 
         self.tokens.remove(deps.storage, &token_id)?;
         self.decrement_tokens(deps.storage)?;
@@ -444,12 +425,7 @@ where
 }
 
 // helpers
-impl<'a, T, C, E, Q> Cw721Contract<'a, T, C, E, Q>
-where
-    T: Serialize + DeserializeOwned + Clone,
-    C: CustomMsg,
-    E: CustomMsg,
-    Q: CustomMsg,
+impl Cw721CharacterContract<'_>
 {
     pub fn _transfer_nft(
         &self,
@@ -458,7 +434,7 @@ where
         info: &MessageInfo,
         recipient: &str,
         token_id: &str,
-    ) -> Result<TokenInfo<T>, ContractError> {
+    ) -> Result<TokenInfo<Metadata>, ContractError> {
         let mut token = self.tokens.load(deps.storage, token_id)?;
         // ensure we have permissions
         self.check_can_send(deps.as_ref(), env, info, &token)?;
@@ -480,7 +456,7 @@ where
         // if add == false, remove. if add == true, remove then set with this expiration
         add: bool,
         expires: Option<Expiration>,
-    ) -> Result<TokenInfo<T>, ContractError> {
+    ) -> Result<TokenInfo<Metadata>, ContractError> {
         let mut token = self.tokens.load(deps.storage, token_id)?;
         // ensure we have permissions
         self.check_can_approve(deps.as_ref(), env, info, &token)?;
@@ -514,7 +490,7 @@ where
         deps: Deps,
         env: &Env,
         info: &MessageInfo,
-        token: &TokenInfo<T>,
+        token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
         // owner can approve
         if token.owner == info.sender {
@@ -542,7 +518,45 @@ where
         deps: Deps,
         env: &Env,
         info: &MessageInfo,
-        token: &TokenInfo<T>,
+        token: &TokenInfo<Metadata>,
+    ) -> Result<(), ContractError> {
+        // owner can send
+        if token.owner == info.sender {
+            return Ok(());
+        }
+
+        // any non-expired token approval can send
+        if token
+            .approvals
+            .iter()
+            .any(|apr| apr.spender == info.sender && !apr.is_expired(&env.block))
+        {
+            return Ok(());
+        }
+
+        // operator can send
+        let op = self
+            .operators
+            .may_load(deps.storage, (&token.owner, &info.sender))?;
+        match op {
+            Some(ex) => {
+                if ex.is_expired(&env.block) {
+                    Err(ContractError::Ownership(OwnershipError::NotOwner))
+                } else {
+                    Ok(())
+                }
+            }
+            None => Err(ContractError::Ownership(OwnershipError::NotOwner)),
+        }
+    }
+
+    /// returns true iff the sender can burn the token
+    pub fn check_can_burn(
+        &self,
+        deps: Deps,
+        env: &Env,
+        info: &MessageInfo,
+        token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
         // owner can send
         if token.owner == info.sender {

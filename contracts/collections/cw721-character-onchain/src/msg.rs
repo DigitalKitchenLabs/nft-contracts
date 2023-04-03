@@ -79,7 +79,7 @@ pub struct RoyaltyInfoResponse {
 /// use other control logic in any contract that inherits this.
 #[cw_ownable_execute]
 #[cw_serde]
-pub enum ExecuteMsg<T, E> {
+pub enum ExecuteMsg<Metadata, E> {
     /// Transfer is a base message to move a token to another account without triggering actions
     TransferNft { recipient: String, token_id: String },
     /// Send is a base message to transfer a token to a contract and trigger an action
@@ -119,7 +119,7 @@ pub enum ExecuteMsg<T, E> {
         /// Metadata JSON Schema
         token_uri: Option<String>,
         /// Any custom extension used by this contract
-        extension: T,
+        extension: Metadata,
     },
 
     /// Burn an NFT the sender has access to
