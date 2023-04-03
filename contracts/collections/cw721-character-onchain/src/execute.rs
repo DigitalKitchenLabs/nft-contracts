@@ -1,7 +1,7 @@
 use cw_ownable::OwnershipError;
 
 use cosmwasm_std::{
-    Binary, Decimal, Deps, DepsMut, Env, Event, MessageInfo, Response, StdResult, Empty,
+    Binary, Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Response, StdResult,
 };
 
 use cw721::{ContractInfoResponse, Cw721ReceiveMsg, Expiration};
@@ -9,8 +9,8 @@ use url::Url;
 
 use crate::error::ContractError;
 use crate::msg::{
-    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, RoyaltyInfo,
-    RoyaltyInfoResponse, UpdateCollectionInfoMsg, Metadata,
+    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, Metadata, RoyaltyInfo,
+    RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
 use crate::state::{Approval, TokenInfo};
 use crate::Cw721CharacterContract;
@@ -122,8 +122,7 @@ impl Cw721CharacterContract<'_> {
 }
 
 // TODO pull this into some sort of trait extension??
-impl Cw721CharacterContract<'_>
-{
+impl Cw721CharacterContract<'_> {
     pub fn mint(
         &self,
         deps: DepsMut,
@@ -281,8 +280,7 @@ impl Cw721CharacterContract<'_>
     }
 }
 
-impl Cw721CharacterContract<'_>
-{
+impl Cw721CharacterContract<'_> {
     fn transfer_nft(
         &self,
         deps: DepsMut,
@@ -425,8 +423,7 @@ impl Cw721CharacterContract<'_>
 }
 
 // helpers
-impl Cw721CharacterContract<'_>
-{
+impl Cw721CharacterContract<'_> {
     pub fn _transfer_nft(
         &self,
         deps: DepsMut,
@@ -520,10 +517,9 @@ impl Cw721CharacterContract<'_>
         info: &MessageInfo,
         token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
-
         //Ensure character is frozen
         if token.extension.frozen == false {
-            return Err(ContractError::CharacterNotFrozen {})
+            return Err(ContractError::CharacterNotFrozen {});
         }
 
         // owner can send

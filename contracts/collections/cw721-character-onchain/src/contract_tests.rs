@@ -1,11 +1,13 @@
 #![cfg(test)]
 use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
 
-use cosmwasm_std::{from_binary, to_binary, Addr, CosmosMsg, DepsMut, Empty, Response, WasmMsg, StdError};
+use cosmwasm_std::{
+    from_binary, to_binary, Addr, CosmosMsg, DepsMut, Empty, Response, StdError, WasmMsg,
+};
 
 use cw721::{
     Approval, ApprovalResponse, ContractInfoResponse, Cw721Query, Cw721ReceiveMsg, NftInfoResponse,
-    OwnerOfResponse, OperatorResponse, OperatorsResponse,
+    OperatorResponse, OperatorsResponse, OwnerOfResponse,
 };
 use cw_ownable::{Expiration, OwnershipError};
 
@@ -14,7 +16,7 @@ use crate::msg::{
     CollectionInfo, CollectionInfoResponse, Metadata, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
 use crate::{
-    Cw721Contract, Cw721CharacterContract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
+    Cw721CharacterContract, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
     QueryMsg,
 };
 
@@ -545,7 +547,6 @@ fn sending_nft() {
         .execute(deps.as_mut(), mock_env(), realowner, send_msg2.clone())
         .unwrap_err();
     assert_eq!(err, ContractError::CharacterNotFrozen {});
-
 }
 
 #[test]

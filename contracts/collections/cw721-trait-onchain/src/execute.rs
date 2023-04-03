@@ -3,7 +3,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use cosmwasm_std::{
-    CustomMsg, Decimal, Deps, DepsMut, Env, Event, MessageInfo, Response, StdResult, Empty,
+    CustomMsg, Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Response, StdResult,
 };
 
 use cw721::{ContractInfoResponse, Expiration};
@@ -11,17 +11,16 @@ use url::Url;
 
 use crate::error::ContractError;
 use crate::msg::{
-    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, RoyaltyInfo,
-    RoyaltyInfoResponse, UpdateCollectionInfoMsg, Metadata,
+    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, Metadata, RoyaltyInfo,
+    RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
 use crate::state::{Approval, Cw721Contract, TokenInfo};
-use crate::{CONTRACT_NAME, CONTRACT_VERSION};
 use crate::Cw721TraitContract;
+use crate::{CONTRACT_NAME, CONTRACT_VERSION};
 
 const MAX_DESCRIPTION_LENGTH: u32 = 512;
 
-impl Cw721TraitContract<'_>
-{
+impl Cw721TraitContract<'_> {
     pub fn instantiate(
         &self,
         deps: DepsMut,
@@ -104,8 +103,7 @@ impl Cw721TraitContract<'_>
 }
 
 // TODO pull this into some sort of trait extension??
-impl Cw721TraitContract<'_>
-{
+impl Cw721TraitContract<'_> {
     pub fn mint(
         &self,
         deps: DepsMut,
@@ -263,8 +261,7 @@ impl Cw721TraitContract<'_>
     }
 }
 
-impl Cw721TraitContract<'_>
-{
+impl Cw721TraitContract<'_> {
     /*fn transfer_nft(
         &self,
         deps: DepsMut,

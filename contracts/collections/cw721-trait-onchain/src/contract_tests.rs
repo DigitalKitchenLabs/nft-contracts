@@ -10,7 +10,10 @@ use crate::error::ContractError;
 use crate::msg::{
     CollectionInfo, CollectionInfoResponse, Metadata, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
 };
-use crate::{Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse, QueryMsg, Cw721TraitContract};
+use crate::{
+    Cw721Contract, Cw721TraitContract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
+    QueryMsg,
+};
 
 const MINTER: &str = "merlin";
 const CONTRACT_NAME: &str = "Magic Power";
