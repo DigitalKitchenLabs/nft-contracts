@@ -19,3 +19,10 @@ pub struct MinterParams<T> {
     pub max_trading_offset_secs: u64,
     pub extension: T,
 }
+
+#[cw_serde]
+pub struct MinterConfig<T> {
+    pub collection_code_id: u64,
+    pub mint_price: Coin,
+    pub extension: T,
+}
