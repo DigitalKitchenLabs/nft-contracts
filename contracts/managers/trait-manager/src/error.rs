@@ -11,4 +11,7 @@ pub enum ContractError {
 
     #[error("{0}")]
     Payment(#[from] PaymentError),
+
+    #[error("If mint price is not fully burned, destination address cannot be empty")]
+    NoMintDestination {},
 }

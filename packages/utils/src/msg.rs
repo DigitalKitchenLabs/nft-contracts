@@ -1,5 +1,6 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, Decimal};
+use cosmwasm_std::{Coin, Addr};
+use cw721_base::msg::{CollectionInfo, RoyaltyInfoResponse};
 
 pub type BaseManagerCreateMsg<T> = CreateManagerMsg<T>;
 
@@ -8,22 +9,6 @@ pub struct CreateManagerMsg<T> {
     pub init_msg: T,
     pub collection_params: CollectionParams,
     pub manager_params: ManagerParams,
-}
-
-#[cw_serde]
-pub struct CollectionInfo<T> {
-    pub creator: String,
-    pub description: String,
-    pub image: String,
-    pub external_link: Option<String>,
-    pub explicit_content: Option<bool>,
-    pub royalty_info: Option<T>,
-}
-
-#[cw_serde]
-pub struct RoyaltyInfoResponse {
-    pub payment_address: String,
-    pub share: Decimal,
 }
 
 #[cw_serde]
@@ -37,15 +22,19 @@ pub struct CollectionParams {
 
 #[cw_serde]
 pub struct ManagerParams {
-    pub creation_fee: Option<Coin>,
-    pub min_mint_price: Option<Coin>,
-    pub mint_fee_bps: Option<u64>,
+    pub mint_price: Coin,
+    //This ratio will be burnt
+    pub burn_ratio: Option<u32>,
+    //Rest sent here
+    pub destination: Option<Addr>,
 }
 
 /// Message for params so they can be updated individually by governance
 #[cw_serde]
 pub struct UpdateManagerParamsMsg {
-    pub creation_fee: Option<Coin>,
-    pub min_mint_price: Option<Coin>,
-    pub mint_fee_bps: Option<u64>,
+    pub mint_price: Coin,
+    //This ratio will be burnt
+    pub burn_ratio: Option<u32>,
+    //Rest sent here
+    pub destination: Option<Addr>,
 }

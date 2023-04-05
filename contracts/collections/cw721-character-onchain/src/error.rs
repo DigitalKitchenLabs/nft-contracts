@@ -46,5 +46,4 @@ pub enum ContractError {
 
     #[error("Character not found")]
     CharacterNotFound {},
-
 }

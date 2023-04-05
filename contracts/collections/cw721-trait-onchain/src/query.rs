@@ -1,3 +1,4 @@
+use cw721_base::msg::{CollectionInfoResponse, RoyaltyInfoResponse};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
@@ -13,7 +14,7 @@ use cw721::{
 use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
-use crate::msg::{CollectionInfoResponse, MinterResponse, QueryMsg, RoyaltyInfoResponse};
+use crate::msg::{MinterResponse, QueryMsg};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;

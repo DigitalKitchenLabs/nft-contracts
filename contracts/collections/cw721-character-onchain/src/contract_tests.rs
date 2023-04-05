@@ -9,12 +9,13 @@ use cw721::{
     Approval, ApprovalResponse, ContractInfoResponse, Cw721Query, Cw721ReceiveMsg, NftInfoResponse,
     OperatorResponse, OperatorsResponse, OwnerOfResponse,
 };
+use cw721_base::msg::{
+    CollectionInfo, CollectionInfoResponse, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+};
 use cw_ownable::{Expiration, OwnershipError};
 
 use crate::error::ContractError;
-use crate::msg::{
-    CollectionInfo, CollectionInfoResponse, Metadata, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
-};
+use crate::msg::Metadata;
 use crate::{
     Cw721CharacterContract, Cw721Contract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
     QueryMsg,

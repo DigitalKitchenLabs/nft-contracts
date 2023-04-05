@@ -1,5 +1,7 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Decimal};
+use cw721_base::msg::{
+    CollectionInfo, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+};
 use cw_ownable::{cw_ownable_execute, cw_ownable_query};
 use schemars::JsonSchema;
 
@@ -25,47 +27,6 @@ pub struct Metadata {
 }
 
 pub type Extension = Metadata;
-
-#[cw_serde]
-pub struct CollectionInfo<T> {
-    pub creator: String,
-    pub description: String,
-    pub image: String,
-    pub external_link: Option<String>,
-    pub explicit_content: Option<bool>,
-    pub royalty_info: Option<T>,
-}
-
-#[cw_serde]
-pub struct UpdateCollectionInfoMsg<T> {
-    pub description: Option<String>,
-    pub image: Option<String>,
-    pub external_link: Option<Option<String>>,
-    pub explicit_content: Option<bool>,
-    pub royalty_info: Option<Option<T>>,
-}
-
-#[cw_serde]
-pub struct RoyaltyInfo {
-    pub payment_address: Addr,
-    pub share: Decimal,
-}
-
-// allows easy conversion from RoyaltyInfo to RoyaltyInfoResponse
-impl RoyaltyInfo {
-    pub fn to_response(&self) -> RoyaltyInfoResponse {
-        RoyaltyInfoResponse {
-            payment_address: self.payment_address.to_string(),
-            share: self.share,
-        }
-    }
-}
-
-#[cw_serde]
-pub struct RoyaltyInfoResponse {
-    pub payment_address: String,
-    pub share: Decimal,
-}
 
 /// This is like Cw721ExecuteMsg but we add a Mint command for an owner
 /// to make this stand-alone. You will likely want to remove mint and

@@ -73,8 +73,7 @@ pub mod entry {
 mod tests {
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cw2::ContractVersion;
-
-    use crate::msg::CollectionInfo;
+    use cw721_base::msg::CollectionInfo;
 
     use super::*;
 

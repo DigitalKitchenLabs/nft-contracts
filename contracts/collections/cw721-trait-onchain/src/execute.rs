@@ -1,16 +1,15 @@
-use cw_ownable::OwnershipError;
-use cosmwasm_std::{
-    Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Response, StdResult,
+use cosmwasm_std::{Decimal, Deps, DepsMut, Empty, Env, Event, MessageInfo, Response, StdResult};
+use cw721_base::msg::{
+    CollectionInfo, CollectionInfoResponse, RoyaltyInfo, RoyaltyInfoResponse,
+    UpdateCollectionInfoMsg,
 };
+use cw_ownable::OwnershipError;
 
 use cw721::{ContractInfoResponse, Expiration};
 use url::Url;
 
 use crate::error::ContractError;
-use crate::msg::{
-    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, Metadata, RoyaltyInfo,
-    RoyaltyInfoResponse, UpdateCollectionInfoMsg,
-};
+use crate::msg::{ExecuteMsg, InstantiateMsg, Metadata};
 use crate::state::{Approval, TokenInfo};
 use crate::Cw721TraitContract;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};

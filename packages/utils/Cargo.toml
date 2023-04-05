@@ -9,8 +9,9 @@ homepage      = { workspace = true }
 documentation = { workspace = true }
 
 [dependencies]
-cosmwasm-schema = { workspace = true }
-cosmwasm-std    = { workspace = true }
-cw-utils        = { workspace = true }
-schemars        = { workspace = true }
-serde           = { workspace = true }
+cosmwasm-schema             = { workspace = true }
+cosmwasm-std                = { workspace = true }
+cw-utils                    = { workspace = true }
+schemars                    = { workspace = true }
+serde                       = { workspace = true }
+cw721-base                  = { workspace = true, features = ["library"] }

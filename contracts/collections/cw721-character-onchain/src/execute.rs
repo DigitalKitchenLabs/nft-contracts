@@ -1,3 +1,7 @@
+use cw721_base::msg::{
+    CollectionInfo, CollectionInfoResponse, RoyaltyInfo, RoyaltyInfoResponse,
+    UpdateCollectionInfoMsg,
+};
 use cw_ownable::OwnershipError;
 
 use cosmwasm_std::{
@@ -8,10 +12,7 @@ use cw721::{ContractInfoResponse, Cw721ReceiveMsg, Expiration};
 use url::Url;
 
 use crate::error::ContractError;
-use crate::msg::{
-    CollectionInfo, CollectionInfoResponse, ExecuteMsg, InstantiateMsg, Metadata, RoyaltyInfo,
-    RoyaltyInfoResponse, UpdateCollectionInfoMsg,
-};
+use crate::msg::{ExecuteMsg, InstantiateMsg, Metadata};
 use crate::state::{Approval, TokenInfo};
 use crate::Cw721CharacterContract;
 use crate::{CONTRACT_NAME, CONTRACT_VERSION};

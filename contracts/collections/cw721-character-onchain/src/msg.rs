@@ -1,5 +1,8 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Decimal, Binary};
+use cosmwasm_std::Binary;
+use cw721_base::msg::{
+    CollectionInfo, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+};
 use cw_ownable::{cw_ownable_execute, cw_ownable_query, Expiration};
 use schemars::JsonSchema;
 
@@ -33,47 +36,6 @@ pub struct Metadata {
 
 pub type Extension = Metadata;
 
-#[cw_serde]
-pub struct CollectionInfo<T> {
-    pub creator: String,
-    pub description: String,
-    pub image: String,
-    pub external_link: Option<String>,
-    pub explicit_content: Option<bool>,
-    pub royalty_info: Option<T>,
-}
-
-#[cw_serde]
-pub struct UpdateCollectionInfoMsg<T> {
-    pub description: Option<String>,
-    pub image: Option<String>,
-    pub external_link: Option<Option<String>>,
-    pub explicit_content: Option<bool>,
-    pub royalty_info: Option<Option<T>>,
-}
-
-#[cw_serde]
-pub struct RoyaltyInfo {
-    pub payment_address: Addr,
-    pub share: Decimal,
-}
-
-// allows easy conversion from RoyaltyInfo to RoyaltyInfoResponse
-impl RoyaltyInfo {
-    pub fn to_response(&self) -> RoyaltyInfoResponse {
-        RoyaltyInfoResponse {
-            payment_address: self.payment_address.to_string(),
-            share: self.share,
-        }
-    }
-}
-
-#[cw_serde]
-pub struct RoyaltyInfoResponse {
-    pub payment_address: String,
-    pub share: Decimal,
-}
-
 /// This is like Cw721ExecuteMsg but we add a Mint command for an owner
 /// to make this stand-alone. You will likely want to remove mint and
 /// use other control logic in any contract that inherits this.
@@ -81,7 +43,10 @@ pub struct RoyaltyInfoResponse {
 #[cw_serde]
 pub enum ExecuteMsg<Metadata, E> {
     /// Transfer is a base message to move a token to another account without triggering actions
-    TransferNft { recipient: String, token_id: String },
+    TransferNft {
+        recipient: String,
+        token_id: String,
+    },
     /// Send is a base message to transfer a token to a contract and trigger an action
     /// on the receiving contract.
     SendNft {
@@ -97,7 +62,10 @@ pub enum ExecuteMsg<Metadata, E> {
         expires: Option<Expiration>,
     },
     /// Remove previously granted Approval
-    Revoke { spender: String, token_id: String },
+    Revoke {
+        spender: String,
+        token_id: String,
+    },
     /// Allows operator to transfer / send any token from the owner's account.
     /// If expiration is set, then this allowance has a time/height limit
     ApproveAll {
@@ -105,7 +73,9 @@ pub enum ExecuteMsg<Metadata, E> {
         expires: Option<Expiration>,
     },
     /// Remove previously granted ApproveAll permission
-    RevokeAll { operator: String },
+    RevokeAll {
+        operator: String,
+    },
 
     /// Mint a new NFT, can only be called by the contract minter
     /// Mint a new NFT, can only be called by the contract minter
@@ -136,10 +106,15 @@ pub enum ExecuteMsg<Metadata, E> {
     FreezeCollectionInfo {},
 
     // Freeze character
-    FreezeCharacter { token_id: String },
+    FreezeCharacter {
+        token_id: String,
+    },
 
     //Modify a character with new traits
-    Modify { token_id: String, new_values: Metadata},
+    Modify {
+        token_id: String,
+        new_values: Metadata,
+    },
 
     /// Extension msg
     Extension {

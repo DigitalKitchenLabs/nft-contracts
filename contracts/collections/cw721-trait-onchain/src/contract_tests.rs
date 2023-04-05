@@ -4,12 +4,13 @@ use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
 use cosmwasm_std::{from_binary, Addr, DepsMut, Empty};
 
 use cw721::{ContractInfoResponse, Cw721Query, NftInfoResponse, OwnerOfResponse};
+use cw721_base::msg::{
+    CollectionInfo, CollectionInfoResponse, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
+};
 use cw_ownable::OwnershipError;
 
 use crate::error::ContractError;
-use crate::msg::{
-    CollectionInfo, CollectionInfoResponse, Metadata, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
-};
+use crate::msg::Metadata;
 use crate::{
     Cw721Contract, Cw721TraitContract, ExecuteMsg, Extension, InstantiateMsg, MinterResponse,
     QueryMsg,
