@@ -1,8 +1,8 @@
 use cosmwasm_std::{Addr, Empty, StdResult, Storage};
 use cw_storage_plus::Item;
-use utils::MinterConfig;
+use utils::ManagerConfig;
 
-pub type Config = MinterConfig<Empty>;
+pub type Config = ManagerConfig<Empty>;
 
 /// Initial configuration of the minter
 pub const CONFIG: Item<Config> = Item::new("config");

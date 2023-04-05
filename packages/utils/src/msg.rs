@@ -1,10 +1,13 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Coin, Decimal};
 
+pub type BaseManagerCreateMsg<T> = CreateManagerMsg<T>;
+
 #[cw_serde]
-pub struct CreateMinterMsg<T> {
+pub struct CreateManagerMsg<T> {
     pub init_msg: T,
     pub collection_params: CollectionParams,
+    pub manager_params: ManagerParams,
 }
 
 #[cw_serde]
@@ -32,22 +35,17 @@ pub struct CollectionParams {
     pub info: CollectionInfo<RoyaltyInfoResponse>,
 }
 
-/// Message for params so they can be updated individually by governance
 #[cw_serde]
-pub struct UpdateMinterParamsMsg<T> {
-    /// The minter code id
-    pub code_id: Option<u64>,
-    pub add_cw721_code_ids: Option<Vec<u64>>,
-    pub rm_cw721_code_ids: Option<Vec<u64>>,
-    pub frozen: Option<bool>,
+pub struct ManagerParams {
     pub creation_fee: Option<Coin>,
     pub min_mint_price: Option<Coin>,
     pub mint_fee_bps: Option<u64>,
-    pub max_trading_offset_secs: Option<u64>,
-    pub extension: T,
 }
 
+/// Message for params so they can be updated individually by governance
 #[cw_serde]
-pub enum ManagerExecuteMsg<T> {
-    CreateMinter(CreateMinterMsg<T>),
+pub struct UpdateManagerParamsMsg {
+    pub creation_fee: Option<Coin>,
+    pub min_mint_price: Option<Coin>,
+    pub mint_fee_bps: Option<u64>,
 }

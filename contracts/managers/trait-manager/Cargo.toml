@@ -25,3 +25,4 @@ schemars        = { workspace = true }
 serde           = { workspace = true }
 thiserror       = { workspace = true }
 utils           = { workspace = true }
+cw2             = { workspace = true }

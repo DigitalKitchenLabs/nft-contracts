@@ -1,27 +1,21 @@
 use cosmwasm_schema::cw_serde;
 
 use crate::CodeId;
-use crate::MinterParams;
+use crate::ManagerParams;
 
 #[cw_serde]
 pub enum ManagerQueryMsg {
     /// Returns `ParamsResponse`
     Params {},
-    AllowedCollectionCodeIds {},
-    AllowedCollectionCodeId(CodeId),
+    AllowedCollectionCodeId {},
 }
 
 #[cw_serde]
 pub struct ParamsResponse<T> {
-    pub params: MinterParams<T>,
-}
-
-#[cw_serde]
-pub struct AllowedCollectionCodeIdsResponse {
-    pub code_ids: Vec<CodeId>,
+    pub params: ManagerParams<T>,
 }
 
 #[cw_serde]
 pub struct AllowedCollectionCodeIdResponse {
-    pub allowed: bool,
+    pub code_id: CodeId,
 }
