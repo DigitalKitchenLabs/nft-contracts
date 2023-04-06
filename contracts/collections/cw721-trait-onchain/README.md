@@ -2,11 +2,13 @@
 
 This is an adaptation of the cw-nfts onchain metadata contract to
 include the CoolCat trait information onchain using the Metadata extension.
-Each trait will have its own collection (e.g. Fur Color) and the value
-of each NFT will be kept in this Metadata.
+All traits will be kept in one collection and will have the trait type (e.g. Fur Color),
+the trait value (e.g. red) and the trait rarity (e.g. common).
 
 ```rust
 pub struct Metadata {
-    pub value: String,
+    pub trait_type: String,
+    pub trait_value: String,
+    pub trait_rarity: String,
 }
 ```
