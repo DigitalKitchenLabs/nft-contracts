@@ -23,7 +23,9 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub struct Metadata {
-    pub value: String,
+    pub trait_type: String,
+    pub trait_value: String,
+    pub trait_rarity: String,
 }
 
 pub type Extension = Metadata;

@@ -99,7 +99,9 @@ fn minting() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
 
@@ -132,7 +134,9 @@ fn minting() {
         NftInfoResponse::<Extension> {
             token_uri: None,
             extension: Metadata {
-                value: String::from("red")
+                trait_type: String::from("hair"),
+                trait_value: String::from("red"),
+                trait_rarity: String::from("common"),
             },
         }
     );
@@ -155,7 +159,9 @@ fn minting() {
         owner: String::from("hercules"),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
 
@@ -183,7 +189,9 @@ fn test_update_minter() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
 
@@ -258,7 +266,9 @@ fn test_update_minter() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
 
@@ -286,7 +296,9 @@ fn burning() {
         owner: MINTER.to_string(),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
 
@@ -342,7 +354,9 @@ fn query_tokens_by_owner() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
     contract
@@ -354,7 +368,9 @@ fn query_tokens_by_owner() {
         owner: ceres.clone(),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
     contract
@@ -366,7 +382,9 @@ fn query_tokens_by_owner() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            value: String::from("red"),
+            trait_type: String::from("hair"),
+            trait_value: String::from("red"),
+            trait_rarity: String::from("common"),
         },
     };
     contract
