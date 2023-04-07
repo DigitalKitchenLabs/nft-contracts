@@ -6,7 +6,14 @@ use utils::msg::UpdateManagerParamsMsg;
 #[cw_ownable_execute]
 #[cw_serde]
 pub enum ExecuteMsg {
-    Mint { token_info: Metadata },
-    MintTo { token_info: Metadata, receiver: String },
-    UpdateConfig { new_config: UpdateManagerParamsMsg }
+    Mint {
+        token_info: Metadata,
+    },
+    MintTo {
+        token_info: Metadata,
+        receiver: String,
+    },
+    UpdateConfig {
+        new_config: UpdateManagerParamsMsg,
+    },
 }

@@ -6,15 +6,16 @@ use crate::{
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    coins, to_binary, BankMsg, CosmosMsg, DepsMut, Empty, Env, MessageInfo, Response, SubMsg,
-    WasmMsg, Deps, StdResult, Binary, Reply, Addr,
+    coins, to_binary, Addr, BankMsg, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo,
+    Reply, Response, StdResult, SubMsg, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw721_trait_onchain::{msg::Extension, InstantiateMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
 use utils::{
     msg::{BaseManagerCreateMsg, UpdateManagerParamsMsg},
-    U64Ext, NATIVE_DENOM, query::{ManagerQueryMsg, ManagerConfigResponse, AllowedCollectionCodeIdResponse}
+    query::{AllowedCollectionCodeIdResponse, ManagerConfigResponse, ManagerQueryMsg},
+    U64Ext, NATIVE_DENOM,
 };
 
 const CONTRACT_NAME: &str = "crates.io:sg-base-minter";
@@ -227,11 +228,10 @@ pub fn update_config(
     Ok(Response::new().add_attribute("action", "update_config"))
 }
 
-
 pub fn query(deps: Deps, _env: Env, msg: ManagerQueryMsg) -> StdResult<Binary> {
     match msg {
         ManagerQueryMsg::Config {} => to_binary(&query_config(deps)?),
-        ManagerQueryMsg::AllowedCollectionCodeId {  } => to_binary(&query_codeid(deps)?),
+        ManagerQueryMsg::AllowedCollectionCodeId {} => to_binary(&query_codeid(deps)?),
     }
 }
 
@@ -247,7 +247,7 @@ fn query_config(deps: Deps) -> StdResult<ManagerConfigResponse<Empty>> {
 
 fn query_codeid(deps: Deps) -> StdResult<AllowedCollectionCodeIdResponse> {
     let config = CONFIG.load(deps.storage)?;
-    Ok(AllowedCollectionCodeIdResponse{
+    Ok(AllowedCollectionCodeIdResponse {
         code_id: config.collection_code_id,
     })
 }

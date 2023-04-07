@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, Addr};
+use cosmwasm_std::{Addr, Coin};
 use cw721_base::msg::{CollectionInfo, RoyaltyInfoResponse};
 
 pub type BaseManagerCreateMsg<T> = CreateManagerMsg<T>;
