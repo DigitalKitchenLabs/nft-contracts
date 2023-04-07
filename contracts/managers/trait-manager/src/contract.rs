@@ -7,7 +7,7 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{to_binary, DepsMut, Empty, Env, MessageInfo, Response, SubMsg, WasmMsg};
 use cw2::set_contract_version;
 use cw721_trait_onchain::InstantiateMsg;
-use utils::msg::BaseManagerCreateMsg;
+use utils::msg::{BaseManagerCreateMsg, UpdateManagerParamsMsg};
 
 const CONTRACT_NAME: &str = "crates.io:sg-base-minter";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -39,7 +39,8 @@ pub fn instantiate(
 
     let config = Config {
         collection_code_id: msg.collection_params.code_id,
-        mint_price: msg.manager_params.mint_price,
+        mint_prices: msg.manager_params.mint_prices,
+        rarities: msg.manager_params.rarities,
         burn_ratio: msg.manager_params.burn_ratio,
         destination: msg.manager_params.destination,
         extension: Empty {},
@@ -73,4 +74,32 @@ pub fn instantiate(
         .add_attribute("contract_version", CONTRACT_VERSION)
         .add_attribute("sender", info.sender)
         .add_submessage(submsg))
+}
+
+//Only governance can update these params.
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn sudo(
+    deps: DepsMut,
+    _env: Env,
+    msg: UpdateManagerParamsMsg,
+) -> Result<Response, ContractError> {
+    //If mint price is not fully burned then there must be a valid destination address to send funds to
+    if msg.burn_ratio.unwrap() != 100 && msg.destination.is_none() {
+        return Err(ContractError::NoMintDestination {});
+    }
+
+    if msg.burn_ratio.unwrap() != 100 {
+        deps.api
+            .addr_validate(&msg.destination.clone().unwrap().into_string())?;
+    }
+
+    let mut config = CONFIG.load(deps.storage)?;
+    config.mint_prices = msg.mint_prices;
+    config.rarities = msg.rarities;
+    config.burn_ratio = msg.burn_ratio;
+    config.destination = msg.destination;
+
+    CONFIG.save(deps.storage, &config)?;
+
+    Ok(Response::new().add_attribute("action", "update_config"))
 }

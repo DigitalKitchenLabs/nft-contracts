@@ -87,6 +87,18 @@ impl Cw721TraitContract<'_> {
                 token_uri,
                 extension,
             } => self.mint(deps, info, token_id, owner, token_uri, extension),
+            ExecuteMsg::Approve {
+                spender,
+                token_id,
+                expires,
+            } => self.approve(deps, env, info, spender, token_id, expires),
+            ExecuteMsg::Revoke { spender, token_id } => {
+                self.revoke(deps, env, info, spender, token_id)
+            }
+            ExecuteMsg::ApproveAll { operator, expires } => {
+                self.approve_all(deps, env, info, operator, expires)
+            }
+            ExecuteMsg::RevokeAll { operator } => self.revoke_all(deps, env, info, operator),
             ExecuteMsg::Burn { token_id } => self.burn(deps, env, info, token_id),
             ExecuteMsg::UpdateCollectionInfo { collection_info } => {
                 self.update_collection_info(deps, env, info, collection_info)
@@ -294,7 +306,7 @@ impl Cw721TraitContract<'_> {
             .add_attribute("sender", info.sender)
             .add_attribute("recipient", contract)
             .add_attribute("token_id", token_id))
-    }
+    }*/
 
     fn approve(
         &self,
@@ -371,7 +383,7 @@ impl Cw721TraitContract<'_> {
             .add_attribute("action", "revoke_all")
             .add_attribute("sender", info.sender)
             .add_attribute("operator", operator))
-    }*/
+    }
 
     fn burn(
         &self,

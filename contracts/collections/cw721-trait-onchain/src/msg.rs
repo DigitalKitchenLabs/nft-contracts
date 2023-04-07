@@ -1,8 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cw721_base::msg::{
-    CollectionInfo, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
-};
-use cw_ownable::{cw_ownable_execute, cw_ownable_query};
+use cw721_base::msg::{CollectionInfo, RoyaltyInfoResponse, UpdateCollectionInfoMsg};
+use cw_ownable::{cw_ownable_execute, cw_ownable_query, Expiration};
 use schemars::JsonSchema;
 
 #[cw_serde]
@@ -50,6 +48,28 @@ pub enum ExecuteMsg<T, E> {
         extension: T,
     },
 
+    /// Allows operator to burn the token from the owner's account.
+    /// If expiration is set, then this allowance has a time/height limit
+    Approve {
+        spender: String,
+        token_id: String,
+        expires: Option<Expiration>,
+    },
+    /// Remove previously granted Approval
+    Revoke {
+        spender: String,
+        token_id: String,
+    },
+    /// Allows operator to transfer / send any token from the owner's account.
+    /// If expiration is set, then this allowance has a time/height limit
+    ApproveAll {
+        operator: String,
+        expires: Option<Expiration>,
+    },
+    /// Remove previously granted ApproveAll permission
+    RevokeAll {
+        operator: String,
+    },
     /// Burn an NFT the sender has access to
     Burn {
         token_id: String,

@@ -17,7 +17,8 @@ pub struct ManagerParams<T> {
 #[cw_serde]
 pub struct ManagerConfig<T> {
     pub collection_code_id: u64,
-    pub mint_price: Coin,
+    pub mint_prices: Vec<Coin>,
+    pub rarities: Vec<String>,
     pub burn_ratio: Option<u32>,
     pub destination: Option<Addr>,
     pub extension: T,

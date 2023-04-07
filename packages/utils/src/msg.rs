@@ -22,7 +22,8 @@ pub struct CollectionParams {
 
 #[cw_serde]
 pub struct ManagerParams {
-    pub mint_price: Coin,
+    pub mint_prices: Vec<Coin>,
+    pub rarities: Vec<String>,
     //This ratio will be burnt
     pub burn_ratio: Option<u32>,
     //Rest sent here
@@ -32,7 +33,8 @@ pub struct ManagerParams {
 /// Message for params so they can be updated individually by governance
 #[cw_serde]
 pub struct UpdateManagerParamsMsg {
-    pub mint_price: Coin,
+    pub mint_prices: Vec<Coin>,
+    pub rarities: Vec<String>,
     //This ratio will be burnt
     pub burn_ratio: Option<u32>,
     //Rest sent here
