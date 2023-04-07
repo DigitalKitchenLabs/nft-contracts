@@ -1,5 +1,6 @@
 
 use cosmwasm_std::StdError;
+use cw_ownable::OwnershipError;
 use cw_utils::PaymentError;
 use thiserror::Error;
 
@@ -9,8 +10,32 @@ pub enum ContractError {
     #[error("{0}")]
     Std(#[from] StdError),
 
+    #[error(transparent)]
+    Ownership(#[from] OwnershipError),
+
     #[error("{0}")]
     Payment(#[from] PaymentError),
+
+    #[error("Invalid reply ID")]
+    InvalidReplyID {},
+
+    #[error("Instantiate cw721 trait collection error")]
+    InstantiateError {},
+
+    #[error("Mint prices array must be the same length as rarities array")]
+    NotSameLength {},
+
+    #[error("Burn ratio must be between 0 and 100")]
+    InvalidBurnRatio {},
+
+    #[error("Rarity not found")]
+    InvalidRarity {},
+
+    #[error("Not enough funds sent to mint")]
+    NotEnoughMintFunds {},
+
+    #[error("Only native denom can be burned")]
+    UnauthorizedBurn {},
 
     #[error("If mint price is not fully burned, destination address cannot be empty")]
     NoMintDestination {},
