@@ -29,4 +29,4 @@ cw721           = { workspace = true }
 schemars        = { workspace = true }
 serde           = { workspace = true }
 thiserror       = { workspace = true }
-url = { workspace = true }
+url             = { workspace = true }

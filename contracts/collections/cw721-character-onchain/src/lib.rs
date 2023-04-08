@@ -32,7 +32,6 @@ pub mod entry {
     use crate::error::ContractError;
 
     use super::*;
-
     #[cfg(not(feature = "library"))]
     use cosmwasm_std::entry_point;
     use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
@@ -93,7 +92,7 @@ mod tests {
                 collection_info: CollectionInfo {
                     creator: "creator".into(),
                     description: "description".into(),
-                    image: "https://example.com/image.png".into(),
+                    image: Some("https://example.com/image.png".into()),
                     external_link: None,
                     explicit_content: None,
                     royalty_info: None,

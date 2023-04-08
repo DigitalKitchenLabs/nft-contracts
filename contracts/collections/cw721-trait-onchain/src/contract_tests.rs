@@ -29,7 +29,7 @@ fn setup_contract(deps: DepsMut<'_>) -> Cw721Contract<'static, Extension, Empty,
         collection_info: CollectionInfo {
             creator: "creator".into(),
             description: "description".into(),
-            image: "https://example.com/image.png".into(),
+            image: Some("https://example.com/image.png".into()),
             external_link: None,
             explicit_content: None,
             royalty_info: None,
@@ -53,7 +53,7 @@ fn proper_instantiation() {
         collection_info: CollectionInfo {
             creator: "creator".into(),
             description: "description".into(),
-            image: "https://example.com/image.png".into(),
+            image: Some("https://example.com/image.png".into()),
             external_link: None,
             explicit_content: None,
             royalty_info: None,
@@ -441,7 +441,7 @@ fn query_collection_info() {
         CollectionInfoResponse {
             creator: "creator".into(),
             description: "description".into(),
-            image: "https://example.com/image.png".into(),
+            image: Some("https://example.com/image.png".into()),
             external_link: None,
             explicit_content: None,
             royalty_info: None,
@@ -489,7 +489,7 @@ fn update_collection() {
         CollectionInfoResponse {
             creator: "creator".into(),
             description: "description_new".into(),
-            image: "https://example-new.com/image.png".into(),
+            image: Some("https://example-new.com/image.png".into()),
             external_link: None,
             explicit_content: None,
             royalty_info: None,

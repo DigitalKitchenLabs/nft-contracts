@@ -38,7 +38,7 @@ where
 
         cw_ownable::initialize_owner(deps.storage, deps.api, Some(&msg.minter))?;
 
-        let image = Url::parse(&msg.collection_info.image)?;
+        let image = Url::parse(&msg.collection_info.image.clone().unwrap())?;
 
 
         if let Some(ref external_link) = msg.collection_info.external_link {
@@ -203,10 +203,10 @@ where
             return Err(ContractError::DescriptionTooLong {});
         }
 
-        collection.image = collection_msg
+        collection.image = Some(collection_msg
             .image
-            .unwrap_or_else(|| collection.image.to_string());
-        Url::parse(&collection.image)?;
+            .unwrap_or_else(|| collection.image.unwrap().to_string()));
+        Url::parse(&collection.image.clone().unwrap())?;
 
         collection.external_link = collection_msg
             .external_link

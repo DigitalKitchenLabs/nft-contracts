@@ -25,7 +25,7 @@ pub struct InstantiateMsg {
 pub struct CollectionInfo<T> {
     pub creator: String,
     pub description: String,
-    pub image: String,
+    pub image: Option<String>,
     pub external_link: Option<String>,
     pub explicit_content: Option<bool>,
     pub royalty_info: Option<T>,
@@ -224,7 +224,7 @@ pub struct MinterResponse {
 pub struct CollectionInfoResponse {
     pub creator: String,
     pub description: String,
-    pub image: String,
+    pub image: Option<String>,
     pub external_link: Option<String>,
     pub explicit_content: Option<bool>,
     pub royalty_info: Option<RoyaltyInfoResponse>,
