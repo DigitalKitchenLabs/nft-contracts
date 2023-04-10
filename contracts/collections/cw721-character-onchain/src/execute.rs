@@ -461,6 +461,8 @@ impl Cw721CharacterContract<'_> {
         info: MessageInfo,
         token_id: String,
     ) -> Result<Response, ContractError> {
+        
+        cw_ownable::assert_owner(deps.storage, &info.sender)?;
         self._freeze_character(deps, &env, &info, &token_id)?;
 
         Ok(Response::new()
