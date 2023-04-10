@@ -47,7 +47,12 @@ pub fn instantiate(
         return Err(ContractError::NoMintDestination {});
     }
 
-    if msg.manager_params.burn_ratio != 100 {
+    //If we are selling anything using a non native denom, we need a destination address as we will not burn those non native tokens.
+    if msg.manager_params.mint_prices.iter().any(|coin| coin.denom != NATIVE_DENOM) && msg.manager_params.destination.is_none(){
+        return Err(ContractError::NoMintDestination {});
+    }
+
+    if msg.manager_params.destination.is_some() {
         deps.api.addr_validate(
             &msg.manager_params
                 .destination
@@ -147,11 +152,8 @@ pub fn mint(
         return Err(ContractError::NotEnoughMintFunds {});
     }
 
-    if config.burn_ratio > 0 {
-        if funds_sent.denom != NATIVE_DENOM {
-            return Err(ContractError::UnauthorizedBurn {});
-        }
-
+    //If we are minting using CoolCat tokens we apply the burn ratio if there is one
+    if funds_sent.denom == NATIVE_DENOM && config.burn_ratio > 0 {
         let amount_burnt = config.burn_ratio.bps_to_decimal() * funds_sent.amount;
         let burn_msg = BankMsg::Burn {
             amount: coins(amount_burnt.u128(), NATIVE_DENOM),
@@ -159,13 +161,21 @@ pub fn mint(
         res.messages.push(SubMsg::new(burn_msg));
     }
 
-    if config.burn_ratio != 100 {
+    //If we are minting using CoolCat we need to adjust the amount sent substracting the burnt amount
+    if funds_sent.denom == NATIVE_DENOM && config.burn_ratio != 100 {
         let amount_sent = (100 - config.burn_ratio).bps_to_decimal() * funds_sent.amount;
         let send_funds_msg = BankMsg::Send {
             to_address: config.destination.unwrap().into_string(),
             amount: coins(amount_sent.u128(), funds_sent.denom),
         };
         res.messages.push(SubMsg::new(send_funds_msg));
+    }else{
+        //Send full amount as nothing is burnt.
+        let send_funds_msg = BankMsg::Send {
+            to_address: config.destination.unwrap().into_string(),
+            amount: coins(funds_sent.amount.u128(), funds_sent.denom),
+        };
+        res.messages.push(SubMsg::new(send_funds_msg))
     }
 
     // Create mint msgs

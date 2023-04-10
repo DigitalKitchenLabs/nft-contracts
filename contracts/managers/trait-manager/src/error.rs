@@ -32,9 +32,6 @@ pub enum ContractError {
     #[error("Not enough funds sent to mint")]
     NotEnoughMintFunds {},
 
-    #[error("Only native denom can be burned")]
-    UnauthorizedBurn {},
-
-    #[error("If mint price is not fully burned, destination address cannot be empty")]
+    #[error("If mint price is not fully burned or is not the native currency, destination address of mint funds cannot be empty")]
     NoMintDestination {},
 }
