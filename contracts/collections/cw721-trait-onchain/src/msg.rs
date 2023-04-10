@@ -75,6 +75,11 @@ pub enum ExecuteMsg<T, E> {
         token_id: String,
     },
 
+    /// Burn multiple NFTs the sender has access to
+    BurnMultiple {
+        token_ids: Vec<String>,
+    },
+
     // Update collection information
     UpdateCollectionInfo {
         collection_info: UpdateCollectionInfoMsg<RoyaltyInfoResponse>,

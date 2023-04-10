@@ -100,6 +100,9 @@ impl Cw721TraitContract<'_> {
             }
             ExecuteMsg::RevokeAll { operator } => self.revoke_all(deps, env, info, operator),
             ExecuteMsg::Burn { token_id } => self.burn(deps, env, info, token_id),
+            ExecuteMsg::BurnMultiple { token_ids } => {
+                self.burn_multiple(deps, env, info, token_ids)
+            }
             ExecuteMsg::UpdateCollectionInfo { collection_info } => {
                 self.update_collection_info(deps, env, info, collection_info)
             }
@@ -177,9 +180,11 @@ impl Cw721TraitContract<'_> {
             return Err(ContractError::DescriptionTooLong {});
         }
 
-        collection.image = Some(collection_msg
-            .image
-            .unwrap_or_else(|| collection.image.unwrap().to_string()));
+        collection.image = Some(
+            collection_msg
+                .image
+                .unwrap_or_else(|| collection.image.unwrap().to_string()),
+        );
         Url::parse(&collection.image.clone().unwrap())?;
 
         collection.external_link = collection_msg
@@ -402,6 +407,27 @@ impl Cw721TraitContract<'_> {
             .add_attribute("action", "burn")
             .add_attribute("sender", info.sender)
             .add_attribute("token_id", token_id))
+    }
+
+    fn burn_multiple(
+        &self,
+        deps: DepsMut,
+        env: Env,
+        info: MessageInfo,
+        token_ids: Vec<String>,
+    ) -> Result<Response, ContractError> {
+        for token_id in token_ids.iter() {
+            let token = self.tokens.load(deps.storage, &token_id)?;
+            self.check_can_send(deps.as_ref(), &env, &info, &token)?;
+
+            self.tokens.remove(deps.storage, &token_id)?;
+            self.decrement_tokens(deps.storage)?;
+        }
+
+        Ok(Response::new()
+            .add_attribute("action", "burn")
+            .add_attribute("sender", info.clone().sender)
+            .add_attribute("tokens", token_ids.join(",")))
     }
 
     // helpers
