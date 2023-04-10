@@ -13,7 +13,7 @@ use cw2::set_contract_version;
 use cw721_trait_onchain::{msg::Extension, InstantiateMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
 use utils::{
-    msg::{BaseManagerCreateMsg, UpdateManagerParamsMsg},
+    msg::{BaseTraitManagerCreateMsg, UpdateTraitManagerParamsMsg},
     query::{AllowedCollectionCodeIdResponse, ManagerConfigResponse, ManagerQueryMsg},
     U64Ext, NATIVE_DENOM,
 };
@@ -27,7 +27,7 @@ pub fn instantiate(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    msg: BaseManagerCreateMsg<Option<Empty>>,
+    msg: BaseTraitManagerCreateMsg<Option<Empty>>,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
@@ -203,7 +203,7 @@ pub fn update_ownership(
 pub fn update_config(
     deps: DepsMut,
     info: MessageInfo,
-    new_config: UpdateManagerParamsMsg,
+    new_config: UpdateTraitManagerParamsMsg,
 ) -> Result<Response, ContractError> {
     //Only owner can update config
     cw_ownable::assert_owner(deps.storage, &info.sender)?;

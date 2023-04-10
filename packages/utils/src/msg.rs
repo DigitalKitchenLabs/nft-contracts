@@ -2,13 +2,13 @@ use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Coin};
 use cw721_base::msg::{CollectionInfo, RoyaltyInfoResponse};
 
-pub type BaseManagerCreateMsg<T> = CreateManagerMsg<T>;
+pub type BaseTraitManagerCreateMsg<T> = CreateTraitManagerMsg<T>;
 
 #[cw_serde]
-pub struct CreateManagerMsg<T> {
+pub struct CreateTraitManagerMsg<T> {
     pub init_msg: T,
     pub collection_params: CollectionParams,
-    pub manager_params: ManagerParams,
+    pub manager_params: TraitManagerParams,
 }
 
 #[cw_serde]
@@ -21,7 +21,7 @@ pub struct CollectionParams {
 }
 
 #[cw_serde]
-pub struct ManagerParams {
+pub struct TraitManagerParams {
     pub mint_prices: Vec<Coin>,
     pub rarities: Vec<String>,
     //This ratio will be burnt
@@ -31,7 +31,7 @@ pub struct ManagerParams {
 }
 
 #[cw_serde]
-pub struct UpdateManagerParamsMsg {
+pub struct UpdateTraitManagerParamsMsg {
     pub mint_prices: Vec<Coin>,
     pub rarities: Vec<String>,
     //This ratio will be burnt
