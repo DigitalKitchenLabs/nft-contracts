@@ -41,8 +41,8 @@ pub enum ContractError {
     #[error("RoyaltyShareIncreased")]
     RoyaltyShareIncreased {},
 
-    #[error("Character is not frozen")]
-    CharacterNotFrozen {},
+    #[error("Character is not locked")]
+    CharacterNotLocked {},
 
     #[error("Character not found")]
     CharacterNotFound {},

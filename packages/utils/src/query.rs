@@ -1,7 +1,8 @@
 use cosmwasm_schema::cw_serde;
 
+use crate::CharacterManagerConfig;
 use crate::CodeId;
-use crate::ManagerConfig;
+use crate::TraitManagerConfig;
 
 #[cw_serde]
 pub enum ManagerQueryMsg {
@@ -11,9 +12,15 @@ pub enum ManagerQueryMsg {
 }
 
 #[cw_serde]
-pub struct ManagerConfigResponse<T> {
+pub struct TraitManagerConfigResponse<T> {
     pub collection_address: String,
-    pub config: ManagerConfig<T>,
+    pub config: TraitManagerConfig<T>,
+}
+
+#[cw_serde]
+pub struct CharacterManagerConfigResponse<T> {
+    pub collection_address: String,
+    pub config: CharacterManagerConfig<T>,
 }
 
 #[cw_serde]

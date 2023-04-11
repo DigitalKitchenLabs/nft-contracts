@@ -111,7 +111,8 @@ fn minting() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -151,7 +152,8 @@ fn minting() {
                 fur_type: Some(String::from("Stripes")),
                 fur_color: Some(String::from("Red")),
                 tail_shape: Some(String::from("Heart")),
-                frozen: false,
+                shop_rarity: None,
+                locked: false,
             },
         }
     );
@@ -181,7 +183,8 @@ fn minting() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -216,7 +219,8 @@ fn test_update_minter() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -298,7 +302,8 @@ fn test_update_minter() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -333,7 +338,8 @@ fn burning() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -392,7 +398,8 @@ fn transferring_nft() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: true,
+            shop_rarity: None,
+            locked: true,
         },
     };
 
@@ -455,7 +462,8 @@ fn sending_nft() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: true,
+            shop_rarity: None,
+            locked: true,
         },
     };
 
@@ -508,7 +516,7 @@ fn sending_nft() {
             .add_attribute("token_id", token_id)
     );
 
-    //Can't send unfrozen character
+    //Can't send unlocked character
 
     // Mint a token
     let token_id2 = "Cat2".to_string();
@@ -526,7 +534,8 @@ fn sending_nft() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -547,7 +556,7 @@ fn sending_nft() {
     let err = contract
         .execute(deps.as_mut(), mock_env(), realowner, send_msg2.clone())
         .unwrap_err();
-    assert_eq!(err, ContractError::CharacterNotFrozen {});
+    assert_eq!(err, ContractError::CharacterNotLocked {});
 }
 
 #[test]
@@ -571,7 +580,8 @@ fn approving_revoking() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: true,
+            shop_rarity: None,
+            locked: true,
         },
     };
 
@@ -724,7 +734,8 @@ fn approving_all_revoking_all() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: true,
+            shop_rarity: None,
+            locked: true,
         },
     };
 
@@ -749,7 +760,8 @@ fn approving_all_revoking_all() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: true,
+            shop_rarity: None,
+            locked: true,
         },
     };
 
@@ -1022,7 +1034,8 @@ fn query_tokens_by_owner() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
     contract
@@ -1041,7 +1054,8 @@ fn query_tokens_by_owner() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
     contract
@@ -1060,7 +1074,8 @@ fn query_tokens_by_owner() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
     contract
@@ -1245,7 +1260,8 @@ fn modify_a_character() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         },
     };
 
@@ -1263,7 +1279,8 @@ fn modify_a_character() {
         fur_type: Some(String::from("Stripes")),
         fur_color: Some(String::from("Red")),
         tail_shape: Some(String::from("Heart")),
-        frozen: false,
+        shop_rarity: None,
+        locked: false,
     };
 
     // minter can modify
@@ -1290,7 +1307,8 @@ fn modify_a_character() {
             fur_type: Some(String::from("Stripes")),
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
-            frozen: false,
+            shop_rarity: None,
+            locked: false,
         }
     );
 

@@ -15,6 +15,7 @@ pub struct Metadata {
     pub fur_type: Option<String>,
     pub fur_color: Option<String>,
     pub tail_shape: Option<String>,
-    pub frozen: bool,
+    pub shop_rarity: Option<String>,
+    pub locked: bool,
 }
 ```

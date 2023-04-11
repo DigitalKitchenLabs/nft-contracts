@@ -10,11 +10,11 @@ use cosmwasm_std::{
     Reply, Response, StdResult, SubMsg, WasmMsg,
 };
 use cw2::set_contract_version;
-use cw721_trait_onchain::{msg::Extension, InstantiateMsg};
+use cw721_character_onchain::{msg::Extension, InstantiateMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
 use utils::{
-    msg::{BaseTraitManagerCreateMsg, UpdateTraitManagerParamsMsg},
-    query::{AllowedCollectionCodeIdResponse, TraitManagerConfigResponse, ManagerQueryMsg},
+    msg::{BaseCharacterManagerCreateMsg, UpdateCharacterManagerParamsMsg},
+    query::{AllowedCollectionCodeIdResponse, CharacterManagerConfigResponse, ManagerQueryMsg},
     U64Ext, NATIVE_DENOM,
 };
 
@@ -27,7 +27,7 @@ pub fn instantiate(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    msg: BaseTraitManagerCreateMsg<Option<Empty>>,
+    msg: BaseCharacterManagerCreateMsg<Option<Empty>>,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
@@ -48,7 +48,19 @@ pub fn instantiate(
     }
 
     //If we are selling anything using a non native denom, we need a destination address as we will not burn those non native tokens.
-    if msg.manager_params.mint_prices.iter().any(|coin| coin.denom != NATIVE_DENOM) && msg.manager_params.destination.is_none(){
+    if msg.manager_params.empty_character_mint_price.denom != NATIVE_DENOM
+        && msg.manager_params.destination.is_none()
+    {
+        return Err(ContractError::NoMintDestination {});
+    }
+
+    if msg
+        .manager_params
+        .character_mint_prices
+        .iter()
+        .any(|coin| coin.denom != NATIVE_DENOM)
+        && msg.manager_params.destination.is_none()
+    {
         return Err(ContractError::NoMintDestination {});
     }
 
@@ -63,14 +75,16 @@ pub fn instantiate(
     }
 
     //The mint prices and rarities arrays must be same length, 1-to-1 price/rarity
-    if msg.manager_params.mint_prices.len() != msg.manager_params.rarities.len() {
+    if msg.manager_params.character_mint_prices.len() != msg.manager_params.character_rarities.len()
+    {
         return Err(ContractError::NotSameLength {});
     }
 
     let config = Config {
         collection_code_id: msg.collection_params.code_id,
-        mint_prices: msg.manager_params.mint_prices,
-        rarities: msg.manager_params.rarities,
+        empty_character_mint_price: msg.manager_params.empty_character_mint_price,
+        character_mint_prices: msg.manager_params.character_mint_prices,
+        character_rarities: msg.manager_params.character_rarities,
         burn_ratio: msg.manager_params.burn_ratio,
         destination: msg.manager_params.destination,
         extension: Empty {},
@@ -91,7 +105,7 @@ pub fn instantiate(
         funds: info.funds,
         admin: None,
         label: format!(
-            "CW721-TRAIT-COLLECTION--{}-{}",
+            "CW721-CHARACTER-COLLECTION--{}-{}",
             msg.collection_params.code_id,
             msg.collection_params.name.trim()
         ),
@@ -139,17 +153,19 @@ pub fn mint(
     let config = CONFIG.load(deps.storage)?;
     let mut res = Response::new();
 
-    let position = config
-        .rarities
-        .iter()
-        .position(|rarity| rarity == &token_info.trait_rarity);
+    if token_info.shop_rarity.is_some() {
+        let position = config
+            .character_rarities
+            .iter()
+            .position(|rarity| rarity == token_info.shop_rarity.as_ref().unwrap());
 
-    if position.is_none() {
-        return Err(ContractError::InvalidRarity {});
-    }
+        if position.is_none() {
+            return Err(ContractError::InvalidRarity {});
+        }
 
-    if funds_sent != config.mint_prices[position.unwrap()] {
-        return Err(ContractError::IncorrectMintFunds {});
+        if funds_sent != config.character_mint_prices[position.unwrap()] {
+            return Err(ContractError::IncorrectMintFunds {});
+        }
     }
 
     //If we are minting using CoolCat tokens we apply the burn ratio if there is one
@@ -169,7 +185,7 @@ pub fn mint(
             amount: coins(amount_sent.u128(), funds_sent.denom),
         };
         res.messages.push(SubMsg::new(send_funds_msg));
-    }else{
+    } else {
         //Send full amount as nothing is burnt.
         let send_funds_msg = BankMsg::Send {
             to_address: config.destination.unwrap().into_string(),
@@ -179,7 +195,7 @@ pub fn mint(
     }
 
     // Create mint msgs
-    let mint_msg = cw721_trait_onchain::ExecuteMsg::<Extension, Empty>::Mint {
+    let mint_msg = cw721_character_onchain::ExecuteMsg::<Extension, Empty>::Mint {
         token_id: increment_token_index(deps.storage)?.to_string(),
         owner: receiver.clone(),
         token_uri: None,
@@ -213,7 +229,7 @@ pub fn update_ownership(
 pub fn update_config(
     deps: DepsMut,
     info: MessageInfo,
-    new_config: UpdateTraitManagerParamsMsg,
+    new_config: UpdateCharacterManagerParamsMsg,
 ) -> Result<Response, ContractError> {
     //Only owner can update config
     cw_ownable::assert_owner(deps.storage, &info.sender)?;
@@ -228,8 +244,9 @@ pub fn update_config(
     }
 
     let mut config = CONFIG.load(deps.storage)?;
-    config.mint_prices = new_config.mint_prices;
-    config.rarities = new_config.rarities;
+    config.empty_character_mint_price = new_config.empty_character_mint_price;
+    config.character_mint_prices = new_config.character_mint_prices;
+    config.character_rarities = new_config.character_rarities;
     config.burn_ratio = new_config.burn_ratio;
     config.destination = new_config.destination;
 
@@ -245,11 +262,11 @@ pub fn query(deps: Deps, _env: Env, msg: ManagerQueryMsg) -> StdResult<Binary> {
     }
 }
 
-fn query_config(deps: Deps) -> StdResult<TraitManagerConfigResponse<Empty>> {
+fn query_config(deps: Deps) -> StdResult<CharacterManagerConfigResponse<Empty>> {
     let config = CONFIG.load(deps.storage)?;
     let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
 
-    Ok(TraitManagerConfigResponse {
+    Ok(CharacterManagerConfigResponse {
         collection_address: collection_address.to_string(),
         config,
     })
