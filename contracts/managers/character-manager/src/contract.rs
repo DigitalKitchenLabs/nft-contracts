@@ -15,7 +15,7 @@ use cw721_character_onchain::{
     msg::{CharacterInfoResponse, Extension, Metadata},
     ExecuteMsg as CharacterExecuteMsg, InstantiateMsg, QueryMsg as CharacterQueryMsg,
 };
-use cw721_trait_onchain::msg::Extension as TraitExtension;
+use cw721_trait_onchain::{msg::Extension as TraitExtension, ExecuteMsg as TraitExecuteMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
 use utils::{
     msg::{BaseCharacterManagerCreateMsg, UpdateCharacterManagerParamsMsg},
@@ -145,6 +145,10 @@ pub fn execute(
             trait_ids,
             trait_collection_addr,
         } => modify_character(deps, info, token_id, trait_ids, trait_collection_addr),
+        ExecuteMsg::LockCharacter {
+            token_id,
+            trait_collection_addr,
+        } => lock_character(deps, info, token_id, trait_collection_addr),
         ExecuteMsg::UpdateConfig { new_config } => update_config(deps, info, new_config),
         ExecuteMsg::UpdateOwnership(action) => update_ownership(deps, env, info, action),
     }
@@ -305,11 +309,67 @@ pub fn modify_character(
         funds: vec![],
     });
 
-    Ok(Response::new().add_message(msg)
+    Ok(Response::new()
+        .add_message(msg)
         .add_attribute("action", "modify_character")
         .add_attribute("sender", info.sender)
         .add_attribute("character_id", character_id))
+}
 
+pub fn lock_character(
+    deps: DepsMut,
+    info: MessageInfo,
+    character_id: String,
+    trait_collection_address: String,
+) -> Result<Response, ContractError> {
+    let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
+
+    let character_response: CharacterInfoResponse<Extension> = deps.querier.query_wasm_smart(
+        collection_address.clone(),
+        &CharacterQueryMsg::<Empty>::CharacterInfo {
+            token_id: character_id.clone(),
+        },
+    )?;
+
+    if character_response.owner != info.sender {
+        return Err(ContractError::NotCharacterOwner {});
+    }
+
+    if character_response.token_info.locked == true {
+        return Err(ContractError::CharacterAlreadyLocked {});
+    }
+
+    let mut res = Response::new();
+
+    if character_response.token_info.traits_equipped.is_some() {
+        let burn_msg = TraitExecuteMsg::<Metadata, Empty>::BurnMultiple {
+            token_ids: character_response.token_info.traits_equipped.unwrap(),
+        };
+
+        let msg1 = CosmosMsg::Wasm(WasmMsg::Execute {
+            contract_addr: trait_collection_address.to_string(),
+            msg: to_binary(&burn_msg)?,
+            funds: vec![],
+        });
+        res.messages.push(SubMsg::new(msg1));
+    }
+
+    let lock_msg = CharacterExecuteMsg::<Metadata, Empty>::LockCharacter {
+        token_id: character_id.clone(),
+    };
+
+    let msg2 = CosmosMsg::Wasm(WasmMsg::Execute {
+        contract_addr: collection_address.to_string(),
+        msg: to_binary(&lock_msg)?,
+        funds: vec![],
+    });
+
+    res.messages.push(SubMsg::new(msg2));
+
+    Ok(res
+        .add_attribute("action", "lock_character")
+        .add_attribute("sender", info.sender)
+        .add_attribute("character_id", character_id))
 }
 
 pub fn update_ownership(

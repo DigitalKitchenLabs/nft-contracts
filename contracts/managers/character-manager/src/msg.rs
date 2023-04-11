@@ -18,6 +18,10 @@ pub enum ExecuteMsg {
         trait_ids: Vec<String>,
         trait_collection_addr: String,
     },
+    LockCharacter{
+        token_id: String,
+        trait_collection_addr: String,
+    },
     UpdateConfig {
         new_config: UpdateCharacterManagerParamsMsg,
     },
