@@ -112,6 +112,7 @@ fn minting() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -153,6 +154,7 @@ fn minting() {
                 fur_color: Some(String::from("Red")),
                 tail_shape: Some(String::from("Heart")),
                 shop_rarity: None,
+                traits_equipped: None,
                 locked: false,
             },
         }
@@ -184,6 +186,7 @@ fn minting() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -220,6 +223,7 @@ fn test_update_minter() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -303,6 +307,7 @@ fn test_update_minter() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -339,6 +344,7 @@ fn burning() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -399,6 +405,7 @@ fn transferring_nft() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: true,
         },
     };
@@ -463,6 +470,7 @@ fn sending_nft() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: true,
         },
     };
@@ -535,6 +543,7 @@ fn sending_nft() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -581,6 +590,7 @@ fn approving_revoking() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: true,
         },
     };
@@ -735,6 +745,7 @@ fn approving_all_revoking_all() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: true,
         },
     };
@@ -761,6 +772,7 @@ fn approving_all_revoking_all() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: true,
         },
     };
@@ -1035,6 +1047,7 @@ fn query_tokens_by_owner() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -1055,6 +1068,7 @@ fn query_tokens_by_owner() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -1075,6 +1089,7 @@ fn query_tokens_by_owner() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -1261,6 +1276,7 @@ fn modify_a_character() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         },
     };
@@ -1280,6 +1296,7 @@ fn modify_a_character() {
         fur_color: Some(String::from("Red")),
         tail_shape: Some(String::from("Heart")),
         shop_rarity: None,
+        traits_equipped: None,
         locked: false,
     };
 
@@ -1308,6 +1325,7 @@ fn modify_a_character() {
             fur_color: Some(String::from("Red")),
             tail_shape: Some(String::from("Heart")),
             shop_rarity: None,
+            traits_equipped: None,
             locked: false,
         }
     );

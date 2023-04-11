@@ -496,6 +496,9 @@ impl Cw721CharacterContract<'_> {
         info: &MessageInfo,
         token_id: &str,
     ) -> Result<TokenInfo<Metadata>, ContractError> {
+        
+        //Only manager will be able to lock because we need to burn the traits
+        cw_ownable::assert_owner(deps.storage, &info.sender)?;
         let mut token = self.tokens.load(deps.storage, token_id)?;
         //check if already locked
         if token.extension.locked == true {
@@ -584,7 +587,7 @@ impl Cw721CharacterContract<'_> {
         info: &MessageInfo,
         token: &TokenInfo<Metadata>,
     ) -> Result<(), ContractError> {
-        //Ensure character is frozen
+        //Ensure character is locked
         if token.extension.locked == false {
             return Err(ContractError::CharacterNotLocked {});
         }

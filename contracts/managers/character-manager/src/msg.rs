@@ -13,6 +13,11 @@ pub enum ExecuteMsg {
         token_info: Metadata,
         receiver: String,
     },
+    ModifyCharacter {
+        token_id: String,
+        trait_ids: Vec<String>,
+        trait_collection_addr: String,
+    },
     UpdateConfig {
         new_config: UpdateCharacterManagerParamsMsg,
     },

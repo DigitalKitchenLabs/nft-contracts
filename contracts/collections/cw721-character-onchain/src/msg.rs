@@ -1,8 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::Binary;
-use cw721_base::msg::{
-    CollectionInfo, RoyaltyInfoResponse, UpdateCollectionInfoMsg,
-};
+use cw721_base::msg::{CollectionInfo, RoyaltyInfoResponse, UpdateCollectionInfoMsg};
 use cw_ownable::{cw_ownable_execute, cw_ownable_query, Expiration};
 use schemars::JsonSchema;
 
@@ -31,7 +29,10 @@ pub struct Metadata {
     pub fur_type: Option<String>,
     pub fur_color: Option<String>,
     pub tail_shape: Option<String>,
+    //If the character is a pre-made one sold in the store, we need to keep track of the rarity to know the mint price
     pub shop_rarity: Option<String>,
+    //Every time we modify the character with new traits, we keep the ID of the traits so that we can burn them if we lock the character
+    pub traits_equipped: Option<Vec<String>>,
     pub locked: bool,
 }
 
@@ -210,6 +211,10 @@ pub enum QueryMsg<Q: JsonSchema> {
     #[returns(CollectionInfoResponse)]
     CollectionInfo {},
 
+    /// Return collection info
+    #[returns(CharacterInfoResponse<Extension>)]
+    CharacterInfo { token_id: String },
+
     /// Extension query
     #[returns(())]
     Extension { msg: Q },
@@ -229,4 +234,10 @@ pub struct CollectionInfoResponse {
     pub external_link: Option<String>,
     pub explicit_content: Option<bool>,
     pub royalty_info: Option<RoyaltyInfoResponse>,
+}
+
+#[cw_serde]
+pub struct CharacterInfoResponse<Extension> {
+    pub owner: String,
+    pub token_info: Extension,
 }

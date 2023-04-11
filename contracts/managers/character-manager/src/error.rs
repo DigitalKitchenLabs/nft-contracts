@@ -34,4 +34,16 @@ pub enum ContractError {
 
     #[error("If mint price is not fully burned or is not the native currency, destination address of mint funds cannot be empty")]
     NoMintDestination {},
+
+    #[error("Sender is not the character owner")]
+    NotCharacterOwner {},
+
+    #[error("Character is already locked, cannot be modified")]
+    CharacterAlreadyLocked {},
+
+    #[error("Sender is not the trait owner")]
+    NotTraitOwner {},
+
+    #[error("Trait type not found")]
+    InvalidTrait {},
 }

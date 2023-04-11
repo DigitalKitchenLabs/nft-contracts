@@ -27,5 +27,7 @@ serde                       = { workspace = true }
 thiserror                   = { workspace = true }
 utils                       = { workspace = true }
 cw2                         = { workspace = true }
+cw721                       = { workspace = true }
 cw721-base                  = { workspace = true, features = ["library"] }
+cw721-trait-onchain         = { workspace = true, features = ["library"] }
 cw721-character-onchain     = { workspace = true, features = ["library"] }

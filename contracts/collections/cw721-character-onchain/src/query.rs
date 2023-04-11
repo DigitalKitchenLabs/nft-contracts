@@ -14,7 +14,7 @@ use cw721::{
 use cw_storage_plus::Bound;
 use cw_utils::maybe_addr;
 
-use crate::msg::{MinterResponse, QueryMsg};
+use crate::msg::{MinterResponse, QueryMsg, CharacterInfoResponse};
 use crate::state::{Approval, Cw721Contract, TokenInfo};
 
 const DEFAULT_LIMIT: u32 = 10;
@@ -321,6 +321,7 @@ where
             }
             QueryMsg::Ownership {} => to_binary(&Self::ownership(deps)?),
             QueryMsg::CollectionInfo {} => to_binary(&self.collection_info(deps)?),
+            QueryMsg::CharacterInfo { token_id } => to_binary(&self.character_info(deps, token_id)?),
             QueryMsg::Extension { msg: _ } => Ok(Binary::default()),
         }
     }
@@ -331,6 +332,11 @@ where
             .map(|a| a.into_string());
 
         Ok(MinterResponse { minter })
+    }
+
+    pub fn character_info(&self, deps:Deps, token_id: String) -> StdResult<CharacterInfoResponse<T>> {
+        let info = self.tokens.load(deps.storage, &token_id)?;
+        Ok(CharacterInfoResponse { owner: info.owner.into_string(), token_info: info.extension })
     }
 
     pub fn ownership(deps: Deps) -> StdResult<cw_ownable::Ownership<Addr>> {

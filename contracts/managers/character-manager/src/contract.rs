@@ -10,7 +10,12 @@ use cosmwasm_std::{
     Reply, Response, StdResult, SubMsg, WasmMsg,
 };
 use cw2::set_contract_version;
-use cw721_character_onchain::{msg::Extension, InstantiateMsg};
+use cw721::{Cw721QueryMsg, NftInfoResponse, TokensResponse};
+use cw721_character_onchain::{
+    msg::{CharacterInfoResponse, Extension, Metadata},
+    ExecuteMsg as CharacterExecuteMsg, InstantiateMsg, QueryMsg as CharacterQueryMsg,
+};
+use cw721_trait_onchain::msg::Extension as TraitExtension;
 use cw_utils::{one_coin, parse_reply_instantiate_data};
 use utils::{
     msg::{BaseCharacterManagerCreateMsg, UpdateCharacterManagerParamsMsg},
@@ -135,6 +140,11 @@ pub fn execute(
             token_info,
             receiver,
         } => mint(deps, info, token_info, receiver),
+        ExecuteMsg::ModifyCharacter {
+            token_id,
+            trait_ids,
+            trait_collection_addr,
+        } => modify_character(deps, info, token_id, trait_ids, trait_collection_addr),
         ExecuteMsg::UpdateConfig { new_config } => update_config(deps, info, new_config),
         ExecuteMsg::UpdateOwnership(action) => update_ownership(deps, env, info, action),
     }
@@ -214,6 +224,92 @@ pub fn mint(
         .add_attribute("action", "mint")
         .add_attribute("sender", info.sender)
         .add_attribute("receiver", receiver))
+}
+
+pub fn modify_character(
+    deps: DepsMut,
+    info: MessageInfo,
+    character_id: String,
+    trait_ids: Vec<String>,
+    trait_collection_address: String,
+) -> Result<Response, ContractError> {
+    let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
+
+    let character_response: CharacterInfoResponse<Extension> = deps.querier.query_wasm_smart(
+        collection_address.clone(),
+        &CharacterQueryMsg::<Empty>::CharacterInfo {
+            token_id: character_id.clone(),
+        },
+    )?;
+
+    if character_response.owner != info.sender {
+        return Err(ContractError::NotCharacterOwner {});
+    }
+
+    if character_response.token_info.locked == true {
+        return Err(ContractError::CharacterAlreadyLocked {});
+    }
+
+    let mut new_character_info = Metadata {
+        name: character_response.token_info.name,
+        ears: None,
+        eyes: None,
+        mouth: None,
+        fur_type: None,
+        fur_color: None,
+        tail_shape: None,
+        shop_rarity: character_response.token_info.shop_rarity,
+        traits_equipped: Some(trait_ids.clone()),
+        locked: false,
+    };
+
+    let all_traits_response: TokensResponse = deps.querier.query_wasm_smart(
+        trait_collection_address.clone(),
+        &Cw721QueryMsg::Tokens {
+            owner: info.sender.clone().into_string(),
+            start_after: None,
+            limit: None,
+        },
+    )?;
+
+    for one_trait_id in trait_ids {
+        if !all_traits_response.tokens.contains(&one_trait_id) {
+            return Err(ContractError::NotTraitOwner {});
+        }
+        let trait_info: NftInfoResponse<TraitExtension> = deps.querier.query_wasm_smart(
+            trait_collection_address.clone(),
+            &Cw721QueryMsg::NftInfo {
+                token_id: one_trait_id,
+            },
+        )?;
+
+        match trait_info.extension.trait_type.as_str() {
+            "ears" => new_character_info.ears = Some(trait_info.extension.trait_value),
+            "eyes" => new_character_info.eyes = Some(trait_info.extension.trait_value),
+            "mouth" => new_character_info.mouth = Some(trait_info.extension.trait_value),
+            "fur_type" => new_character_info.fur_type = Some(trait_info.extension.trait_value),
+            "fur_color" => new_character_info.fur_color = Some(trait_info.extension.trait_value),
+            "tail_shape" => new_character_info.tail_shape = Some(trait_info.extension.trait_value),
+            _ => return Err(ContractError::InvalidTrait {}),
+        }
+    }
+
+    let modify_msg = CharacterExecuteMsg::<Metadata, Empty>::Modify {
+        token_id: character_id.clone(),
+        new_values: new_character_info,
+    };
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute {
+        contract_addr: collection_address.to_string(),
+        msg: to_binary(&modify_msg)?,
+        funds: vec![],
+    });
+
+    Ok(Response::new().add_message(msg)
+        .add_attribute("action", "modify_character")
+        .add_attribute("sender", info.sender)
+        .add_attribute("character_id", character_id))
+
 }
 
 pub fn update_ownership(
