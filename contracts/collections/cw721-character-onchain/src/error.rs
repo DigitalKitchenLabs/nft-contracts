@@ -41,6 +41,9 @@ pub enum ContractError {
     #[error("RoyaltyShareIncreased")]
     RoyaltyShareIncreased {},
 
+    #[error("Character is already locked")]
+    CharacterAlreadyLocked {},
+
     #[error("Character is not locked")]
     CharacterNotLocked {},
 

@@ -196,9 +196,11 @@ impl Cw721CharacterContract<'_> {
             return Err(ContractError::DescriptionTooLong {});
         }
 
-        collection.image = Some(collection_msg
-            .image
-            .unwrap_or_else(|| collection.image.unwrap().to_string()));
+        collection.image = Some(
+            collection_msg
+                .image
+                .unwrap_or_else(|| collection.image.unwrap().to_string()),
+        );
         Url::parse(&collection.image.clone().unwrap())?;
 
         collection.external_link = collection_msg
@@ -461,8 +463,6 @@ impl Cw721CharacterContract<'_> {
         info: MessageInfo,
         token_id: String,
     ) -> Result<Response, ContractError> {
-        
-        cw_ownable::assert_owner(deps.storage, &info.sender)?;
         self._lock_character(deps, &env, &info, &token_id)?;
 
         Ok(Response::new()
@@ -497,6 +497,10 @@ impl Cw721CharacterContract<'_> {
         token_id: &str,
     ) -> Result<TokenInfo<Metadata>, ContractError> {
         let mut token = self.tokens.load(deps.storage, token_id)?;
+        //check if already locked
+        if token.extension.locked == true {
+            return Err(ContractError::CharacterAlreadyLocked {});
+        }
         // ensure we have permissions
         self.check_can_burn_or_lock(deps.as_ref(), env, info, &token)?;
         // lock the character
