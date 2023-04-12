@@ -399,6 +399,33 @@ pub fn update_config(
             .addr_validate(&new_config.destination.clone().unwrap().into_string())?;
     }
 
+    let range = 0..100;
+    if !range.contains(&new_config.burn_ratio) {
+        return Err(ContractError::InvalidBurnRatio {});
+    }
+
+    //If we are selling anything using a non native denom, we need a destination address as we will not burn those non native tokens.
+    if new_config.empty_character_mint_price.denom != NATIVE_DENOM
+        && new_config.destination.is_none()
+    {
+        return Err(ContractError::NoMintDestination {});
+    }
+
+    //If we are selling anything using a non native denom, we need a destination address as we will not burn those non native tokens.
+    if new_config
+        .character_mint_prices
+        .iter()
+        .any(|coin| coin.denom != NATIVE_DENOM)
+        && new_config.destination.is_none()
+    {
+        return Err(ContractError::NoMintDestination {});
+    }
+
+    //The mint prices and rarities arrays must be same length, 1-to-1 price/rarity
+    if new_config.character_mint_prices.len() != new_config.character_rarities.len() {
+        return Err(ContractError::NotSameLength {});
+    }
+
     let mut config = CONFIG.load(deps.storage)?;
     config.empty_character_mint_price = new_config.empty_character_mint_price;
     config.character_mint_prices = new_config.character_mint_prices;
@@ -435,7 +462,7 @@ fn query_codeid(deps: Deps) -> StdResult<AllowedCollectionCodeIdResponse> {
     })
 }
 
-// Reply callback triggered from cw721 trait-onchain collection contract instantiation in instantiate()
+// Reply callback triggered from cw721 character-onchain collection contract instantiation in instantiate()
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
     if msg.id != INSTANTIATE_CW721_REPLY_ID {
@@ -449,7 +476,7 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
             COLLECTION_ADDRESS.save(deps.storage, &Addr::unchecked(collection_address.clone()))?;
             Ok(Response::default()
                 .add_attribute("action", "instantiate_sg721_reply")
-                .add_attribute("cw721_trait_collection_address", collection_address))
+                .add_attribute("cw721_character_collection_address", collection_address))
         }
         Err(_) => Err(ContractError::InstantiateError {}),
     }

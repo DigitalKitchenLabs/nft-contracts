@@ -14,7 +14,7 @@ use cw721_trait_onchain::{msg::Extension, InstantiateMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
 use utils::{
     msg::{BaseTraitManagerCreateMsg, UpdateTraitManagerParamsMsg},
-    query::{AllowedCollectionCodeIdResponse, TraitManagerConfigResponse, ManagerQueryMsg},
+    query::{AllowedCollectionCodeIdResponse, ManagerQueryMsg, TraitManagerConfigResponse},
     U64Ext, NATIVE_DENOM,
 };
 
@@ -48,7 +48,13 @@ pub fn instantiate(
     }
 
     //If we are selling anything using a non native denom, we need a destination address as we will not burn those non native tokens.
-    if msg.manager_params.mint_prices.iter().any(|coin| coin.denom != NATIVE_DENOM) && msg.manager_params.destination.is_none(){
+    if msg
+        .manager_params
+        .mint_prices
+        .iter()
+        .any(|coin| coin.denom != NATIVE_DENOM)
+        && msg.manager_params.destination.is_none()
+    {
         return Err(ContractError::NoMintDestination {});
     }
 
@@ -169,7 +175,7 @@ pub fn mint(
             amount: coins(amount_sent.u128(), funds_sent.denom),
         };
         res.messages.push(SubMsg::new(send_funds_msg));
-    }else{
+    } else {
         //Send full amount as nothing is burnt.
         let send_funds_msg = BankMsg::Send {
             to_address: config.destination.unwrap().into_string(),
@@ -225,6 +231,26 @@ pub fn update_config(
     if new_config.burn_ratio != 100 {
         deps.api
             .addr_validate(&new_config.destination.clone().unwrap().into_string())?;
+    }
+
+    let range = 0..100;
+    if !range.contains(&new_config.burn_ratio) {
+        return Err(ContractError::InvalidBurnRatio {});
+    }
+
+    //If we are selling anything using a non native denom, we need a destination address as we will not burn those non native tokens.
+    if new_config
+        .mint_prices
+        .iter()
+        .any(|coin| coin.denom != NATIVE_DENOM)
+        && new_config.destination.is_none()
+    {
+        return Err(ContractError::NoMintDestination {});
+    }
+
+    //The mint prices and rarities arrays must be same length, 1-to-1 price/rarity
+    if new_config.mint_prices.len() != new_config.rarities.len() {
+        return Err(ContractError::NotSameLength {});
     }
 
     let mut config = CONFIG.load(deps.storage)?;
