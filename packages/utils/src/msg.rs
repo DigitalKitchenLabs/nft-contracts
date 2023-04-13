@@ -57,6 +57,8 @@ pub struct CharacterManagerParams {
     pub burn_ratio: u64,
     //Rest sent here
     pub destination: Option<Addr>,
+    pub trait_collection_addr: Addr,
+    pub mintable_collection_addr: Addr,
 }
 
 #[cw_serde]

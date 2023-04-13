@@ -1,6 +1,9 @@
 use crate::{
     msg::ExecuteMsg,
-    state::{increment_token_index, Config, COLLECTION_ADDRESS, CONFIG},
+    state::{
+        increment_token_index, Config, COLLECTION_ADDRESS, CONFIG, MINTABLE_COLLECTION_ADDRESS,
+        TRAIT_COLLECTION_ADDRESS,
+    },
     ContractError,
 };
 #[cfg(not(feature = "library"))]
@@ -97,6 +100,22 @@ pub fn instantiate(
 
     CONFIG.save(deps.storage, &config)?;
 
+    deps.api.addr_validate(
+        &msg.manager_params
+            .trait_collection_addr
+            .clone()
+            .into_string(),
+    )?;
+    deps.api.addr_validate(
+        &msg.manager_params
+            .mintable_collection_addr
+            .clone()
+            .into_string(),
+    )?;
+
+    TRAIT_COLLECTION_ADDRESS.save(deps.storage, &msg.manager_params.trait_collection_addr)?;
+    MINTABLE_COLLECTION_ADDRESS.save(deps.storage, &msg.manager_params.mintable_collection_addr)?;
+
     let collection_info = msg.collection_params.info.clone();
 
     let wasm_msg = WasmMsg::Instantiate {
@@ -143,12 +162,8 @@ pub fn execute(
         ExecuteMsg::ModifyCharacter {
             token_id,
             trait_ids,
-            trait_collection_addr,
-        } => modify_character(deps, info, token_id, trait_ids, trait_collection_addr),
-        ExecuteMsg::LockCharacter {
-            token_id,
-            trait_collection_addr,
-        } => lock_character(deps, info, token_id, trait_collection_addr),
+        } => modify_character(deps, info, token_id, trait_ids),
+        ExecuteMsg::LockCharacter { token_id } => lock_character(deps, info, token_id),
         ExecuteMsg::UpdateConfig { new_config } => update_config(deps, info, new_config),
         ExecuteMsg::UpdateOwnership(action) => update_ownership(deps, env, info, action),
     }
@@ -235,7 +250,6 @@ pub fn modify_character(
     info: MessageInfo,
     character_id: String,
     trait_ids: Vec<String>,
-    trait_collection_address: String,
 ) -> Result<Response, ContractError> {
     let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
 
@@ -266,6 +280,8 @@ pub fn modify_character(
         traits_equipped: Some(trait_ids.clone()),
         locked: false,
     };
+
+    let trait_collection_address = TRAIT_COLLECTION_ADDRESS.load(deps.storage)?;
 
     let all_traits_response: TokensResponse = deps.querier.query_wasm_smart(
         trait_collection_address.clone(),
@@ -320,7 +336,6 @@ pub fn lock_character(
     deps: DepsMut,
     info: MessageInfo,
     character_id: String,
-    trait_collection_address: String,
 ) -> Result<Response, ContractError> {
     let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
 
@@ -340,6 +355,8 @@ pub fn lock_character(
     }
 
     let mut res = Response::new();
+
+    let trait_collection_address = TRAIT_COLLECTION_ADDRESS.load(deps.storage)?;
 
     if character_response.token_info.traits_equipped.is_some() {
         let burn_msg = TraitExecuteMsg::<Metadata, Empty>::BurnMultiple {
