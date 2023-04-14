@@ -59,17 +59,3 @@ done
 
 rm -rf contracts/**/schema/raw
 """
-
-[tasks.publish]
-script = """
-crates=(
-  cw721
-  cw721-base
-)
-
-for crate in $crates; do
-  cargo publish -p $crate
-  echo "Sleeping before publishing the next crate..."
-  sleep 30
-done
-"""

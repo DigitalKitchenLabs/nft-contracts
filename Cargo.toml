@@ -2,7 +2,8 @@
 members = [
     "packages/*", 
     "contracts/collections/*",
-    "contracts/managers/*"
+    "contracts/managers/*",
+    "contracts/data/*"
     ]
 
 [workspace.package]
@@ -45,6 +46,14 @@ codegen-units = 1
 incremental = false
 
 [profile.release.package.trait-manager]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.character-manager]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.mintables]
 codegen-units = 1
 incremental = false
 
