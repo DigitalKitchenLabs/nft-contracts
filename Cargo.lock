@@ -63,7 +63,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "character-manager"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -279,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "cw721"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -290,7 +290,7 @@ dependencies = [
 
 [[package]]
 name = "cw721-base"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -307,7 +307,7 @@ dependencies = [
 
 [[package]]
 name = "cw721-character-onchain"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -325,7 +325,7 @@ dependencies = [
 
 [[package]]
 name = "cw721-trait-onchain"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -552,7 +552,7 @@ checksum = "201de327520df007757c1f0adce6e827fe8562fbc28bfd9c15571c66ca1f5f79"
 
 [[package]]
 name = "mintables"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -841,7 +841,7 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "trait-manager"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -851,6 +851,7 @@ dependencies = [
  "cw2",
  "cw721-base",
  "cw721-trait-onchain",
+ "mintables",
  "schemars",
  "serde",
  "thiserror",
@@ -909,7 +910,7 @@ dependencies = [
 
 [[package]]
 name = "utils"
-version = "0.17.0"
+version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",

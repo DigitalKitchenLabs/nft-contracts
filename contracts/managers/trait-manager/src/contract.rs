@@ -139,7 +139,6 @@ pub fn mint(
     receiver: String,
 ) -> Result<Response, ContractError> {
     deps.api.addr_validate(&receiver)?;
-
     let funds_sent = one_coin(&info)?;
 
     let config = CONFIG.load(deps.storage)?;
