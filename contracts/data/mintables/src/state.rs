@@ -22,6 +22,7 @@ pub struct Character {
     pub fur_color: Option<String>,
     pub tail_shape: Option<String>,
     pub rarity: String,
+    pub locked: bool,
 }
 
 //Trait bundle structure

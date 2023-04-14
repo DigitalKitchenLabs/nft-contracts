@@ -46,4 +46,16 @@ pub enum ContractError {
 
     #[error("Trait type not found")]
     InvalidTrait {},
+
+    #[error("Character does not exist in mintables contract")]
+    InvalidCharacter {},
+
+    #[error("Cannot mint a locked character")]
+    InvalidMintLocked {},
+
+    #[error("Cannot mint a character with traits equipped")]
+    InvalidMintTraits {},
+
+    #[error("Cannot mint an empty character with trait values or locked")]
+    InvalidEmptyCharacterMint {},
 }

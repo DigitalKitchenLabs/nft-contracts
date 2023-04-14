@@ -75,6 +75,7 @@ dependencies = [
  "cw721-base",
  "cw721-character-onchain",
  "cw721-trait-onchain",
+ "mintables",
  "schemars",
  "serde",
  "thiserror",

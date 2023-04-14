@@ -31,3 +31,4 @@ cw721                       = { workspace = true }
 cw721-base                  = { workspace = true, features = ["library"] }
 cw721-trait-onchain         = { workspace = true, features = ["library"] }
 cw721-character-onchain     = { workspace = true, features = ["library"] }
+mintables                   = { workspace = true, features = ["library"] }

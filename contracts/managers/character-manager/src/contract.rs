@@ -20,6 +20,7 @@ use cw721_character_onchain::{
 };
 use cw721_trait_onchain::{msg::Extension as TraitExtension, ExecuteMsg as TraitExecuteMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
+use mintables::msg::{CharactersResp, QueryMsg};
 use utils::{
     msg::{BaseCharacterManagerCreateMsg, UpdateCharacterManagerParamsMsg},
     query::{AllowedCollectionCodeIdResponse, CharacterManagerConfigResponse, ManagerQueryMsg},
@@ -182,7 +183,32 @@ pub fn mint(
     let config = CONFIG.load(deps.storage)?;
     let mut res = Response::new();
 
+    //We check if the equipped traits is empty -- this can only have value when we modify an existing character, not when we mitn one
+    if token_info.traits_equipped.is_some() {
+        return Err(ContractError::InvalidMintTraits {});
+    }
+
     if token_info.shop_rarity.is_some() {
+        //We are minting a pre-made character from the store
+
+        //We check if the character is mintable
+        let mintables_collection_address = MINTABLE_COLLECTION_ADDRESS.load(deps.storage)?;
+        let characters_response: CharactersResp = deps
+            .querier
+            .query_wasm_smart(mintables_collection_address, &QueryMsg::Characters {})?;
+
+        if !characters_response.characters.iter().any(|c| {
+            c.ears == token_info.ears
+                && c.eyes == token_info.eyes
+                && c.mouth == token_info.mouth
+                && c.fur_type == token_info.fur_type
+                && c.fur_color == token_info.fur_color
+                && c.tail_shape == token_info.tail_shape
+                && c.locked == token_info.locked
+        }) {
+            return Err(ContractError::InvalidCharacter {});
+        }
+
         let position = config
             .character_rarities
             .iter()
@@ -193,6 +219,25 @@ pub fn mint(
         }
 
         if funds_sent != config.character_mint_prices[position.unwrap()] {
+            return Err(ContractError::IncorrectMintFunds {});
+        }
+    } else {
+        //We are minting an empty character
+
+        //We check if all traits are empty and it is not locked
+        if token_info.ears.is_some()
+            || token_info.eyes.is_some()
+            || token_info.mouth.is_some()
+            || token_info.fur_type.is_some()
+            || token_info.fur_color.is_some()
+            || token_info.tail_shape.is_some()
+            || token_info.shop_rarity.is_some()
+            || token_info.locked == true
+        {
+            return Err(ContractError::InvalidEmptyCharacterMint {});
+        }
+
+        if funds_sent != config.empty_character_mint_price {
             return Err(ContractError::IncorrectMintFunds {});
         }
     }
