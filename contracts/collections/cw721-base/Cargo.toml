@@ -1,9 +1,9 @@
 [package]
 name          = "cw721-base"
 description   = "Implementation cw721 NFTs with Stargaze on-chain collection info"
+authors       = { workspace = true }
 version       = { workspace = true }
 edition       = { workspace = true }
-license       = { workspace = true }
 repository    = { workspace = true }
 homepage      = { workspace = true }
 documentation = { workspace = true }

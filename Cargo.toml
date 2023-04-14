@@ -8,7 +8,7 @@ members = [
 [workspace.package]
 version       = "0.17.0"
 edition       = "2021"
-license       = "Apache-2.0"
+authors       = ["Keyne"]
 repository = "https://github.com/DigitalKitchenLabs/nft-contracts"
 homepage = "https://coolcat.space"
 documentation = "https://docs.cosmwasm.com"

@@ -3,7 +3,7 @@ name          = "utils"
 description   = "Definition and types for the CoolCat managers"
 version       = { workspace = true }
 edition       = { workspace = true }
-license       = { workspace = true }
+authors       = { workspace = true }
 repository    = { workspace = true }
 homepage      = { workspace = true }
 documentation = { workspace = true }
