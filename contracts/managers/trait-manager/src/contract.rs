@@ -1,6 +1,8 @@
 use crate::{
     msg::ExecuteMsg,
-    state::{increment_token_index, Config, COLLECTION_ADDRESS, CONFIG},
+    state::{
+        increment_token_index, Config, COLLECTION_ADDRESS, CONFIG, MINTABLE_COLLECTION_ADDRESS,
+    },
     ContractError,
 };
 #[cfg(not(feature = "library"))]
@@ -12,6 +14,7 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 use cw721_trait_onchain::{msg::Extension, InstantiateMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
+use mintables::msg::{QueryMsg, TraitsResp};
 use utils::{
     msg::{BaseTraitManagerCreateMsg, UpdateTraitManagerParamsMsg},
     query::{AllowedCollectionCodeIdResponse, ManagerQueryMsg, TraitManagerConfigResponse},
@@ -72,6 +75,16 @@ pub fn instantiate(
     if msg.manager_params.mint_prices.len() != msg.manager_params.rarities.len() {
         return Err(ContractError::NotSameLength {});
     }
+
+    //Store the address of the mintables collection for future queries
+    deps.api.addr_validate(
+        &msg.manager_params
+            .mintable_collection_addr
+            .clone()
+            .into_string(),
+    )?;
+
+    MINTABLE_COLLECTION_ADDRESS.save(deps.storage, &msg.manager_params.mintable_collection_addr)?;
 
     let config = Config {
         collection_code_id: msg.collection_params.code_id,
@@ -140,6 +153,20 @@ pub fn mint(
 ) -> Result<Response, ContractError> {
     deps.api.addr_validate(&receiver)?;
     let funds_sent = one_coin(&info)?;
+
+    //We check if the trait is mintable
+    let mintables_collection_address = MINTABLE_COLLECTION_ADDRESS.load(deps.storage)?;
+    let traits_response: TraitsResp = deps
+        .querier
+        .query_wasm_smart(mintables_collection_address, &QueryMsg::Traits {})?;
+
+    if !traits_response.traits.iter().any(|t| {
+        t.trait_type == token_info.trait_type
+            && t.trait_value == token_info.trait_value
+            && t.trait_rarity == token_info.trait_rarity
+    }) {
+        return Err(ContractError::InvalidTrait {});
+    }
 
     let config = CONFIG.load(deps.storage)?;
     let mut res = Response::new();

@@ -10,6 +10,9 @@ pub const CONFIG: Item<Config> = Item::new("config");
 /// This is saved after handling a reply in instantiation. Therefore it's not in `Config`.
 pub const COLLECTION_ADDRESS: Item<Addr> = Item::new("collection_address");
 
+//This is saved during instantiation and is the address used to verify that the nft to be minted contains valid metadata
+pub const MINTABLE_COLLECTION_ADDRESS: Item<Addr> = Item::new("mintables_collection_address");
+
 /// This keeps track of the token index for the token_ids
 pub const TOKEN_INDEX: Item<u64> = Item::new("token_index");
 

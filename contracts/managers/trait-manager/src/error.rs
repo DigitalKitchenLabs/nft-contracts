@@ -34,4 +34,7 @@ pub enum ContractError {
 
     #[error("If mint price is not fully burned or is not the native currency, destination address of mint funds cannot be empty")]
     NoMintDestination {},
+
+    #[error("Trait does not exist in mintables contract")]
+    InvalidTrait {},
 }

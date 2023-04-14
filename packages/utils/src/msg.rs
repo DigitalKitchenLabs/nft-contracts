@@ -29,6 +29,7 @@ pub struct TraitManagerParams {
     pub burn_ratio: u64,
     //Rest sent here
     pub destination: Option<Addr>,
+    pub mintable_collection_addr: Addr,
 }
 
 #[cw_serde]
