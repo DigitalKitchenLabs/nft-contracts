@@ -13,6 +13,10 @@ pub enum ExecuteMsg {
         token_info: Metadata,
         receiver: String,
     },
+    MintBundle{
+        bundle_id: u32,
+        receiver: Option<String>,
+    },
     ModifyCharacter {
         token_id: String,
         trait_ids: Vec<String>,

@@ -13,6 +13,10 @@ pub enum ExecuteMsg {
         token_info: Metadata,
         receiver: String,
     },
+    MintBundle{
+        bundle_id: u32,
+        receiver: Option<String>,
+    },
     UpdateConfig {
         new_config: UpdateTraitManagerParamsMsg,
     },

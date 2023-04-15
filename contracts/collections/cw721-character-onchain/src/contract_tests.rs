@@ -104,7 +104,7 @@ fn minting() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -146,7 +146,7 @@ fn minting() {
         NftInfoResponse::<Extension> {
             token_uri: None,
             extension: Metadata {
-                name: String::from("Cat1"),
+                name: Some(String::from("Cat1")),
                 ears: Some(String::from("Stiff")),
                 eyes: Some(String::from("Aviator")),
                 mouth: Some(String::from("Cool")),
@@ -178,7 +178,7 @@ fn minting() {
         owner: String::from("hercules"),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -215,7 +215,7 @@ fn test_update_minter() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -299,7 +299,7 @@ fn test_update_minter() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -336,7 +336,7 @@ fn burning() {
         owner: MINTER.to_string(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -397,7 +397,7 @@ fn transferring_nft() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -462,7 +462,7 @@ fn sending_nft() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -535,7 +535,7 @@ fn sending_nft() {
         owner: demeter2.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -582,7 +582,7 @@ fn approving_revoking() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -737,7 +737,7 @@ fn approving_all_revoking_all() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -764,7 +764,7 @@ fn approving_all_revoking_all() {
         owner: demeter2.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")) ,
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -1039,7 +1039,7 @@ fn query_tokens_by_owner() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -1060,7 +1060,7 @@ fn query_tokens_by_owner() {
         owner: ceres.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -1081,7 +1081,7 @@ fn query_tokens_by_owner() {
         owner: demeter.clone(),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -1268,7 +1268,7 @@ fn modify_a_character() {
         owner: String::from("medusa"),
         token_uri: None,
         extension: Metadata {
-            name: String::from("Cat1"),
+            name: Some(String::from("Cat1")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),
@@ -1288,7 +1288,7 @@ fn modify_a_character() {
         .unwrap();
 
     let new_extension = Metadata {
-        name: String::from("Cat2"),
+        name: Some(String::from("Cat2")),
         ears: Some(String::from("Stiff")),
         eyes: Some(String::from("Aviator")),
         mouth: Some(String::from("Cool")),
@@ -1317,7 +1317,7 @@ fn modify_a_character() {
     assert_eq!(
         token.extension,
         Metadata {
-            name: String::from("Cat2"),
+            name: Some(String::from("Cat2")),
             ears: Some(String::from("Stiff")),
             eyes: Some(String::from("Aviator")),
             mouth: Some(String::from("Cool")),

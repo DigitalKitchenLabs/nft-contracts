@@ -20,7 +20,7 @@ use cw721_character_onchain::{
 };
 use cw721_trait_onchain::{msg::Extension as TraitExtension, ExecuteMsg as TraitExecuteMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
-use mintables::msg::{CharactersResp, QueryMsg};
+use mintables::msg::{CharactersResp, QueryMsg, CharacterBundlesResp};
 use utils::{
     msg::{BaseCharacterManagerCreateMsg, UpdateCharacterManagerParamsMsg},
     query::{AllowedCollectionCodeIdResponse, CharacterManagerConfigResponse, ManagerQueryMsg},
@@ -158,6 +158,10 @@ pub fn execute(
             token_info,
             receiver,
         } => mint(deps, info, token_info, receiver),
+        ExecuteMsg::MintBundle {
+            bundle_id,
+            receiver,
+        } => mint_bundle(deps, info, bundle_id, receiver),
         ExecuteMsg::ModifyCharacter {
             token_id,
             trait_ids,
@@ -280,6 +284,101 @@ pub fn mint(
         .add_attribute("action", "mint")
         .add_attribute("sender", info.sender)
         .add_attribute("receiver", receiver))
+}
+
+pub fn mint_bundle(
+    deps: DepsMut,
+    info: MessageInfo,
+    bundle_id: u32,
+    receiver: Option<String>,
+) -> Result<Response, ContractError> {
+    let send_to = receiver.unwrap_or(info.sender.to_string());
+    deps.api.addr_validate(&send_to)?;
+
+    let funds_sent = one_coin(&info)?;
+
+    //We check if the bundle is mintable
+    let mintables_collection_address = MINTABLE_COLLECTION_ADDRESS.load(deps.storage)?;
+    let bundle_response: CharacterBundlesResp = deps
+        .querier
+        .query_wasm_smart(mintables_collection_address, &QueryMsg::CharacterBundles {})?;
+
+    let bundle = bundle_response.bundles.iter().find(|b| b.id == bundle_id);
+
+    if bundle.is_none() {
+        return Err(ContractError::InvalidBundle {});
+    }
+
+    let config = CONFIG.load(deps.storage)?;
+    let mut res = Response::new();
+
+    if funds_sent != bundle.unwrap().mint_price {
+        return Err(ContractError::IncorrectMintFunds {});
+    }
+
+    //If we are minting using CoolCat tokens we apply the burn ratio if there is one
+    if funds_sent.denom == NATIVE_DENOM && config.burn_ratio > 0 {
+        let amount_burnt = config.burn_ratio.bps_to_decimal() * funds_sent.amount;
+        let burn_msg = BankMsg::Burn {
+            amount: coins(amount_burnt.u128(), NATIVE_DENOM),
+        };
+        res.messages.push(SubMsg::new(burn_msg));
+    }
+
+    //If we are minting using CoolCat we need to adjust the amount sent substracting the burnt amount
+    if funds_sent.denom == NATIVE_DENOM && config.burn_ratio != 100 {
+        let amount_sent = (100 - config.burn_ratio).bps_to_decimal() * funds_sent.amount;
+        let send_funds_msg = BankMsg::Send {
+            to_address: config.destination.unwrap().into_string(),
+            amount: coins(amount_sent.u128(), funds_sent.denom),
+        };
+        res.messages.push(SubMsg::new(send_funds_msg));
+    } else {
+        //Send full amount as nothing is burnt.
+        let send_funds_msg = BankMsg::Send {
+            to_address: config.destination.unwrap().into_string(),
+            amount: coins(funds_sent.amount.u128(), funds_sent.denom),
+        };
+        res.messages.push(SubMsg::new(send_funds_msg))
+    }
+
+    let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
+
+    for new_character in bundle.unwrap().characters.clone() {
+        let token_info = Extension {
+            name: None,
+            ears: new_character.ears,
+            eyes: new_character.eyes,
+            mouth: new_character.mouth,
+            fur_type: new_character.fur_type,
+            fur_color: new_character.fur_color,
+            tail_shape: new_character.tail_shape,
+            rarity: Some(new_character.rarity),
+            traits_equipped: None,
+            locked: new_character.locked,
+        };
+
+        // Create mint msgs
+        let mint_msg = cw721_character_onchain::ExecuteMsg::<Extension, Empty>::Mint {
+            token_id: increment_token_index(deps.storage)?.to_string(),
+            owner: send_to.clone(),
+            token_uri: None,
+            extension: token_info,
+        };
+
+        let msg = CosmosMsg::Wasm(WasmMsg::Execute {
+            contract_addr: collection_address.to_string(),
+            msg: to_binary(&mint_msg)?,
+            funds: vec![],
+        });
+        res = res.add_message(msg);
+    }
+
+    Ok(res
+        .add_attribute("action", "mint_bundle")
+        .add_attribute("bundle_id", bundle_id.to_string())
+        .add_attribute("sender", info.sender)
+        .add_attribute("receiver", send_to))
 }
 
 pub fn modify_character(

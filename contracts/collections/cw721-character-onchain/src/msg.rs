@@ -22,7 +22,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub struct Metadata {
-    pub name: String,
+    pub name: Option<String>,
     pub ears: Option<String>,
     pub eyes: Option<String>,
     pub mouth: Option<String>,

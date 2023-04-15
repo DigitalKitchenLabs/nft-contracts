@@ -34,4 +34,7 @@ pub enum ContractError {
 
     #[error("Trait does not exist in mintables contract")]
     InvalidTrait {},
+
+    #[error("Bundle does not exist in mintables contract")]
+    InvalidBundle {},
 }

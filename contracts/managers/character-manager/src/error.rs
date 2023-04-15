@@ -55,4 +55,7 @@ pub enum ContractError {
 
     #[error("Cannot mint an empty character with trait values or locked")]
     InvalidEmptyCharacterMint {},
+
+    #[error("Bundle does not exist in mintables contract")]
+    InvalidBundle {},
 }
