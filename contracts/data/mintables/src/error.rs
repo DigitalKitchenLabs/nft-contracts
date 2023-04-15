@@ -12,4 +12,7 @@ pub enum ContractError {
 
     #[error("ID already exists, cannot add")]
     IDExists {},
+
+    #[error("Goods and possibilities arrays must be same length")]
+    NotSameLength {},
 }

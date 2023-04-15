@@ -1,3 +1,4 @@
+use cosmwasm_std::Coin;
 use cw_storage_plus::Item;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -9,6 +10,7 @@ pub struct Trait {
     pub trait_type: String,
     pub trait_value: String,
     pub trait_rarity: String,
+    pub mint_price: Coin,
 }
 
 //Premade Character structure
@@ -23,6 +25,7 @@ pub struct Character {
     pub tail_shape: Option<String>,
     pub rarity: String,
     pub locked: bool,
+    pub mint_price: Coin,
 }
 
 //Trait bundle structure
@@ -30,7 +33,7 @@ pub struct Character {
 pub struct TraitBundle {
     pub id: u32,
     pub traits: Vec<Trait>,
-    pub total_discount_percentage: u32,
+    pub mint_price: Coin,
 }
 
 //Character bundle structure
@@ -38,7 +41,7 @@ pub struct TraitBundle {
 pub struct CharacterBundle {
     pub id: u32,
     pub characters: Vec<Character>,
-    pub total_discount_percentage: u32,
+    pub mint_price: Coin,
 }
 
 //Trait Lootbox structure
@@ -47,6 +50,7 @@ pub struct TraitLootbox {
     pub id: u32,
     pub traits: Vec<Trait>,
     pub possibilities: Vec<u32>,
+    pub mint_price: Coin,
 }
 
 //Character Lootbox structure
@@ -55,6 +59,7 @@ pub struct CharacterLootbox {
     pub id: u32,
     pub characters: Vec<Character>,
     pub possibilities: Vec<u32>,
+    pub mint_price: Coin,
 }
 
 pub const TRAITS: Item<Vec<Trait>> = Item::new("traits");

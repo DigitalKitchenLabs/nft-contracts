@@ -92,8 +92,6 @@ pub fn instantiate(
     let config = Config {
         collection_code_id: msg.collection_params.code_id,
         empty_character_mint_price: msg.manager_params.empty_character_mint_price,
-        character_mint_prices: msg.manager_params.character_mint_prices,
-        character_rarities: msg.manager_params.character_rarities,
         burn_ratio: msg.manager_params.burn_ratio,
         destination: msg.manager_params.destination,
         extension: Empty {},
@@ -188,7 +186,7 @@ pub fn mint(
         return Err(ContractError::InvalidMintTraits {});
     }
 
-    if token_info.shop_rarity.is_some() {
+    if token_info.rarity.is_some() {
         //We are minting a pre-made character from the store
 
         //We check if the character is mintable
@@ -197,7 +195,7 @@ pub fn mint(
             .querier
             .query_wasm_smart(mintables_collection_address, &QueryMsg::Characters {})?;
 
-        if !characters_response.characters.iter().any(|c| {
+        let character = characters_response.characters.iter().find(|c| {
             c.ears == token_info.ears
                 && c.eyes == token_info.eyes
                 && c.mouth == token_info.mouth
@@ -205,20 +203,14 @@ pub fn mint(
                 && c.fur_color == token_info.fur_color
                 && c.tail_shape == token_info.tail_shape
                 && c.locked == token_info.locked
-        }) {
+                && c.rarity == token_info.rarity.clone().unwrap()
+        });
+
+        if character.is_none() {
             return Err(ContractError::InvalidCharacter {});
         }
 
-        let position = config
-            .character_rarities
-            .iter()
-            .position(|rarity| rarity == token_info.shop_rarity.as_ref().unwrap());
-
-        if position.is_none() {
-            return Err(ContractError::InvalidRarity {});
-        }
-
-        if funds_sent != config.character_mint_prices[position.unwrap()] {
+        if funds_sent != character.unwrap().mint_price {
             return Err(ContractError::IncorrectMintFunds {});
         }
     } else {
@@ -231,7 +223,7 @@ pub fn mint(
             || token_info.fur_type.is_some()
             || token_info.fur_color.is_some()
             || token_info.tail_shape.is_some()
-            || token_info.shop_rarity.is_some()
+            || token_info.rarity.is_some()
             || token_info.locked == true
         {
             return Err(ContractError::InvalidEmptyCharacterMint {});
@@ -321,7 +313,7 @@ pub fn modify_character(
         fur_type: None,
         fur_color: None,
         tail_shape: None,
-        shop_rarity: character_response.token_info.shop_rarity,
+        rarity: character_response.token_info.rarity,
         traits_equipped: Some(trait_ids.clone()),
         locked: false,
     };
@@ -490,8 +482,6 @@ pub fn update_config(
 
     let mut config = CONFIG.load(deps.storage)?;
     config.empty_character_mint_price = new_config.empty_character_mint_price;
-    config.character_mint_prices = new_config.character_mint_prices;
-    config.character_rarities = new_config.character_rarities;
     config.burn_ratio = new_config.burn_ratio;
     config.destination = new_config.destination;
 

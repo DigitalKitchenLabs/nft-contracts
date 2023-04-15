@@ -30,7 +30,7 @@ pub struct Metadata {
     pub fur_color: Option<String>,
     pub tail_shape: Option<String>,
     //If the character is a pre-made one sold in the store, we need to keep track of the rarity to know the mint price
-    pub shop_rarity: Option<String>,
+    pub rarity: Option<String>,
     //Every time we modify the character with new traits, we keep the ID of the traits so that we can burn them if we lock the character
     pub traits_equipped: Option<Vec<String>>,
     pub locked: bool,

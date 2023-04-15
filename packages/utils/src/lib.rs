@@ -11,8 +11,6 @@ pub const NATIVE_DENOM: &str = "uccat";
 #[cw_serde]
 pub struct TraitManagerConfig<T> {
     pub collection_code_id: u64,
-    pub mint_prices: Vec<Coin>,
-    pub rarities: Vec<String>,
     pub burn_ratio: u64,
     pub destination: Option<Addr>,
     pub extension: T,
@@ -22,8 +20,6 @@ pub struct TraitManagerConfig<T> {
 pub struct CharacterManagerConfig<T> {
     pub collection_code_id: u64,
     pub empty_character_mint_price: Coin,
-    pub character_mint_prices: Vec<Coin>,
-    pub character_rarities: Vec<String>,
     //This ratio will be burnt
     pub burn_ratio: u64,
     //Rest sent here

@@ -88,8 +88,6 @@ pub fn instantiate(
 
     let config = Config {
         collection_code_id: msg.collection_params.code_id,
-        mint_prices: msg.manager_params.mint_prices,
-        rarities: msg.manager_params.rarities,
         burn_ratio: msg.manager_params.burn_ratio,
         destination: msg.manager_params.destination,
         extension: Empty {},
@@ -160,27 +158,20 @@ pub fn mint(
         .querier
         .query_wasm_smart(mintables_collection_address, &QueryMsg::Traits {})?;
 
-    if !traits_response.traits.iter().any(|t| {
+    let new_trait = traits_response.traits.iter().find(|t| {
         t.trait_type == token_info.trait_type
             && t.trait_value == token_info.trait_value
             && t.trait_rarity == token_info.trait_rarity
-    }) {
+    });
+
+    if new_trait.is_none() {
         return Err(ContractError::InvalidTrait {});
     }
 
     let config = CONFIG.load(deps.storage)?;
     let mut res = Response::new();
 
-    let position = config
-        .rarities
-        .iter()
-        .position(|rarity| rarity == &token_info.trait_rarity);
-
-    if position.is_none() {
-        return Err(ContractError::InvalidRarity {});
-    }
-
-    if funds_sent != config.mint_prices[position.unwrap()] {
+    if funds_sent != new_trait.unwrap().mint_price {
         return Err(ContractError::IncorrectMintFunds {});
     }
 
@@ -280,8 +271,6 @@ pub fn update_config(
     }
 
     let mut config = CONFIG.load(deps.storage)?;
-    config.mint_prices = new_config.mint_prices;
-    config.rarities = new_config.rarities;
     config.burn_ratio = new_config.burn_ratio;
     config.destination = new_config.destination;
 

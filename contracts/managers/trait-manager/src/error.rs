@@ -26,9 +26,6 @@ pub enum ContractError {
     #[error("Burn ratio must be between 0 and 100")]
     InvalidBurnRatio {},
 
-    #[error("Rarity not found")]
-    InvalidRarity {},
-
     #[error("Incorrect mind funds sent")]
     IncorrectMintFunds {},
 

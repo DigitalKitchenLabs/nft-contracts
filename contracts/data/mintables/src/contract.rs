@@ -214,6 +214,11 @@ pub mod exec {
             {
                 return Err(ContractError::IDExists {});
             }
+
+            if new_trait_lootbox.traits.len() != new_trait_lootbox.possibilities.len() {
+                return Err(ContractError::NotSameLength {});
+            }
+
             trait_lootboxes.push(new_trait_lootbox)
         }
 
@@ -256,6 +261,11 @@ pub mod exec {
             {
                 return Err(ContractError::IDExists {});
             }
+
+            if new_character_lootbox.characters.len() != new_character_lootbox.possibilities.len() {
+                return Err(ContractError::NotSameLength {});
+            }
+
             character_lootboxes.push(new_character_lootbox)
         }
 
