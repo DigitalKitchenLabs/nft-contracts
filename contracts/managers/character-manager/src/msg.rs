@@ -21,6 +21,10 @@ pub enum ExecuteMsg {
         lootbox_id: u32,
         receiver: Option<String>,
     },
+    ChangeName{
+        token_id: String,
+        new_name: String,
+    },
     ModifyCharacter {
         token_id: String,
         trait_ids: Vec<String>,

@@ -167,6 +167,7 @@ pub fn execute(
             lootbox_id,
             receiver,
         } => open_lootbox(deps, info, env, lootbox_id, receiver),
+        ExecuteMsg::ChangeName { token_id, new_name } => change_name(deps, info, token_id, new_name),
         ExecuteMsg::ModifyCharacter {
             token_id,
             trait_ids,
@@ -500,6 +501,56 @@ pub fn open_lootbox(
         .add_attribute("won_element", position.to_string())
         .add_attribute("sender", info.sender)
         .add_attribute("receiver", send_to))
+}
+
+pub fn change_name(
+    deps: DepsMut,
+    info: MessageInfo,
+    character_id: String,
+    new_name: String,
+) -> Result<Response, ContractError> {
+    let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
+
+    let character_response: CharacterInfoResponse<Extension> = deps.querier.query_wasm_smart(
+        collection_address.clone(),
+        &CharacterQueryMsg::<Empty>::CharacterInfo {
+            token_id: character_id.clone(),
+        },
+    )?;
+
+    if character_response.owner != info.sender {
+        return Err(ContractError::NotCharacterOwner {});
+    }
+
+    let new_character_info = Metadata {
+        name: Some(new_name),
+        ears: character_response.token_info.ears,
+        eyes: character_response.token_info.eyes,
+        mouth: character_response.token_info.mouth,
+        fur_type: character_response.token_info.fur_type,
+        fur_color: character_response.token_info.fur_color,
+        tail_shape: character_response.token_info.tail_shape,
+        rarity: character_response.token_info.rarity,
+        traits_equipped: character_response.token_info.traits_equipped,
+        locked: character_response.token_info.locked,
+    };
+
+    let modify_msg = CharacterExecuteMsg::<Metadata, Empty>::Modify {
+        token_id: character_id.clone(),
+        new_values: new_character_info,
+    };
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute {
+        contract_addr: collection_address.to_string(),
+        msg: to_binary(&modify_msg)?,
+        funds: vec![],
+    });
+
+    Ok(Response::new()
+        .add_message(msg)
+        .add_attribute("action", "change_name")
+        .add_attribute("sender", info.sender)
+        .add_attribute("character_id", character_id))
 }
 
 pub fn modify_character(
