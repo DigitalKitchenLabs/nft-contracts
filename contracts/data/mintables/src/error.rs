@@ -13,6 +13,12 @@ pub enum ContractError {
     #[error("ID already exists, cannot add")]
     IDExists {},
 
-    #[error("Goods and possibilities arrays must be same length")]
+    #[error("Goods and possibilities arrays must be the same length")]
     NotSameLength {},
+
+    #[error("Goods cannot be empty")]
+    Empty {},
+
+    #[error("Sum of lootbox probabilities must be 100")]
+    InvalidProbabilities {},
 }

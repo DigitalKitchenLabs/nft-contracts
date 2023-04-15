@@ -13,8 +13,12 @@ pub enum ExecuteMsg {
         token_info: Metadata,
         receiver: String,
     },
-    MintBundle{
+    MintBundle {
         bundle_id: u32,
+        receiver: Option<String>,
+    },
+    OpenLootbox {
+        lootbox_id: u32,
         receiver: Option<String>,
     },
     ModifyCharacter {

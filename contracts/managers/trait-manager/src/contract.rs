@@ -14,7 +14,8 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 use cw721_trait_onchain::{msg::Extension, InstantiateMsg};
 use cw_utils::{one_coin, parse_reply_instantiate_data};
-use mintables::msg::{QueryMsg, TraitBundlesResp, TraitsResp};
+use mintables::msg::{QueryMsg, TraitBundlesResp, TraitLootboxesResp, TraitsResp};
+use sha2::{Digest, Sha256};
 use utils::{
     msg::{BaseTraitManagerCreateMsg, UpdateTraitManagerParamsMsg},
     query::{AllowedCollectionCodeIdResponse, ManagerQueryMsg, TraitManagerConfigResponse},
@@ -142,6 +143,10 @@ pub fn execute(
             bundle_id,
             receiver,
         } => mint_bundle(deps, info, bundle_id, receiver),
+        ExecuteMsg::OpenLootbox {
+            lootbox_id,
+            receiver,
+        } => open_lootbox(deps, info, env, lootbox_id, receiver),
         ExecuteMsg::UpdateConfig { new_config } => update_config(deps, info, new_config),
         ExecuteMsg::UpdateOwnership(action) => update_ownership(deps, env, info, action),
     }
@@ -316,6 +321,114 @@ pub fn mint_bundle(
         .add_attribute("receiver", send_to))
 }
 
+pub fn open_lootbox(
+    deps: DepsMut,
+    info: MessageInfo,
+    env: Env,
+    lootbox_id: u32,
+    receiver: Option<String>,
+) -> Result<Response, ContractError> {
+    let send_to = receiver.unwrap_or(info.sender.to_string());
+    deps.api.addr_validate(&send_to)?;
+
+    let funds_sent = one_coin(&info)?;
+
+    //We check if the bundle is mintable
+    let mintables_collection_address = MINTABLE_COLLECTION_ADDRESS.load(deps.storage)?;
+    let lootbox_response: TraitLootboxesResp = deps
+        .querier
+        .query_wasm_smart(mintables_collection_address, &QueryMsg::TraitLootboxes {})?;
+
+    let lootbox = lootbox_response
+        .lootboxes
+        .iter()
+        .find(|lb| lb.id == lootbox_id);
+
+    if lootbox.is_none() {
+        return Err(ContractError::InvalidLootbox {});
+    }
+
+    let config = CONFIG.load(deps.storage)?;
+    let mut res = Response::new();
+
+    if funds_sent != lootbox.unwrap().mint_price {
+        return Err(ContractError::IncorrectMintFunds {});
+    }
+
+    //If we are minting using CoolCat tokens we apply the burn ratio if there is one
+    if funds_sent.denom == NATIVE_DENOM && config.burn_ratio > 0 {
+        let amount_burnt = config.burn_ratio.bps_to_decimal() * funds_sent.amount;
+        let burn_msg = BankMsg::Burn {
+            amount: coins(amount_burnt.u128(), NATIVE_DENOM),
+        };
+        res.messages.push(SubMsg::new(burn_msg));
+    }
+
+    //If we are minting using CoolCat we need to adjust the amount sent substracting the burnt amount
+    if funds_sent.denom == NATIVE_DENOM && config.burn_ratio != 100 {
+        let amount_sent = (100 - config.burn_ratio).bps_to_decimal() * funds_sent.amount;
+        let send_funds_msg = BankMsg::Send {
+            to_address: config.destination.unwrap().into_string(),
+            amount: coins(amount_sent.u128(), funds_sent.denom),
+        };
+        res.messages.push(SubMsg::new(send_funds_msg));
+    } else {
+        //Send full amount as nothing is burnt.
+        let send_funds_msg = BankMsg::Send {
+            to_address: config.destination.unwrap().into_string(),
+            amount: coins(funds_sent.amount.u128(), funds_sent.denom),
+        };
+        res.messages.push(SubMsg::new(send_funds_msg))
+    }
+
+    let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
+    let mut current = random_number_1_to_100(
+        &env,
+        send_to.clone(),
+        lootbox_response.lootboxes.len().try_into().unwrap(),
+    );
+    let mut position = 0;
+
+    //Find which item of the lootbox we get according to possibilities
+    for possibility in lootbox.unwrap().possibilities.clone() {
+        if current <= possibility {
+            break;
+        } else {
+            position += 1;
+            current -= possibility;
+        }
+    }
+
+    let token_info = Extension {
+        trait_type: lootbox.unwrap().traits[position].clone().trait_type,
+        trait_rarity: lootbox.unwrap().traits[position].clone().trait_rarity,
+        trait_value: lootbox.unwrap().traits[position].clone().trait_value,
+    };
+
+    // Create mint msgs
+    let mint_msg = cw721_trait_onchain::ExecuteMsg::<Extension, Empty>::Mint {
+        token_id: increment_token_index(deps.storage)?.to_string(),
+        owner: send_to.clone(),
+        token_uri: None,
+        extension: token_info,
+    };
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute {
+        contract_addr: collection_address.to_string(),
+        msg: to_binary(&mint_msg)?,
+        funds: vec![],
+    });
+
+    res = res.add_message(msg);
+
+    Ok(res
+        .add_attribute("action", "open_lootbox")
+        .add_attribute("lootbox_id", lootbox_id.to_string())
+        .add_attribute("won_element", position.to_string())
+        .add_attribute("sender", info.sender)
+        .add_attribute("receiver", send_to))
+}
+
 pub fn update_ownership(
     deps: DepsMut,
     env: Env,
@@ -414,4 +527,53 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
         }
         Err(_) => Err(ContractError::InstantiateError {}),
     }
+}
+
+//We get around using random libraries by importing the things we need from
+//https://docs.rs/rand/0.8.1/i686-unknown-linux-gnu/src/rand/rngs/xoshiro128plusplus.rs.html
+
+fn random_number_1_to_100(env: &Env, sender: String, array_len: u32) -> u32 {
+    let tx_index = if let Some(tx) = &env.transaction {
+        tx.index
+    } else {
+        0
+    };
+    let sha256 = Sha256::digest(
+        format!("{}{}{}{}", sender, env.block.height, array_len, tx_index).into_bytes(),
+    );
+    // Cut first 16 bytes from 32 byte value
+    let randomness: [u8; 16] = sha256.to_vec()[0..16].try_into().unwrap();
+    let mut state = [0; 4];
+    read_u32_into(&randomness, &mut state);
+    let rng = get_u32(&mut state);
+    let a_number = rng.checked_rem_euclid(100).unwrap() + 1;
+
+    a_number
+}
+
+pub fn read_u32_into(src: &[u8], dst: &mut [u32]) {
+    assert!(src.len() >= 4 * dst.len());
+    for (out, chunk) in dst.iter_mut().zip(src.chunks_exact(4)) {
+        *out = u32::from_le_bytes(chunk.try_into().unwrap());
+    }
+}
+
+fn get_u32(dst: &mut [u32]) -> u32 {
+    let result_starstar = dst[0]
+        .wrapping_add(dst[3])
+        .rotate_left(7)
+        .wrapping_add(dst[0]);
+
+    let t = dst[1] << 9;
+
+    dst[2] ^= dst[0];
+    dst[3] ^= dst[1];
+    dst[1] ^= dst[2];
+    dst[0] ^= dst[3];
+
+    dst[2] ^= t;
+
+    dst[3] = dst[3].rotate_left(11);
+
+    result_starstar
 }

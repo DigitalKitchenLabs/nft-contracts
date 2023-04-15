@@ -17,6 +17,10 @@ pub enum ExecuteMsg {
         bundle_id: u32,
         receiver: Option<String>,
     },
+    OpenLootbox{
+        lootbox_id: u32,
+        receiver: Option<String>,
+    },
     UpdateConfig {
         new_config: UpdateTraitManagerParamsMsg,
     },

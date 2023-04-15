@@ -58,4 +58,7 @@ pub enum ContractError {
 
     #[error("Bundle does not exist in mintables contract")]
     InvalidBundle {},
+
+    #[error("Lootbox does not exist in mintables contract")]
+    InvalidLootbox {},
 }

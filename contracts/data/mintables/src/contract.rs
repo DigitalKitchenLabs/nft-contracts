@@ -130,6 +130,9 @@ pub mod exec {
             if trait_bundles.iter().any(|tb| tb.id == new_trait_bundle.id) {
                 return Err(ContractError::IDExists {});
             }
+            if new_trait_bundle.traits.is_empty() {
+                return Err(ContractError::Empty {});
+            }
             trait_bundles.push(new_trait_bundle)
         }
 
@@ -171,6 +174,9 @@ pub mod exec {
                 .any(|cb| cb.id == new_character_bundle.id)
             {
                 return Err(ContractError::IDExists {});
+            }
+            if new_character_bundle.characters.is_empty() {
+                return Err(ContractError::Empty {});
             }
             character_bundles.push(new_character_bundle)
         }
@@ -215,8 +221,17 @@ pub mod exec {
                 return Err(ContractError::IDExists {});
             }
 
+            if new_trait_lootbox.traits.is_empty() {
+                return Err(ContractError::Empty {});
+            }
+
             if new_trait_lootbox.traits.len() != new_trait_lootbox.possibilities.len() {
                 return Err(ContractError::NotSameLength {});
+            }
+
+            let sum: u32 = new_trait_lootbox.possibilities.iter().sum();
+            if sum != 100 {
+                return Err(ContractError::InvalidProbabilities {});
             }
 
             trait_lootboxes.push(new_trait_lootbox)
@@ -262,8 +277,17 @@ pub mod exec {
                 return Err(ContractError::IDExists {});
             }
 
+            if new_character_lootbox.characters.is_empty() {
+                return Err(ContractError::Empty {});
+            }
+
             if new_character_lootbox.characters.len() != new_character_lootbox.possibilities.len() {
                 return Err(ContractError::NotSameLength {});
+            }
+
+            let sum: u32 = new_character_lootbox.possibilities.iter().sum();
+            if sum != 100 {
+                return Err(ContractError::InvalidProbabilities {});
             }
 
             character_lootboxes.push(new_character_lootbox)
