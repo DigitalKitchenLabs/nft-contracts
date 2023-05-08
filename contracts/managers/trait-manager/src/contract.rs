@@ -22,7 +22,7 @@ use utils::{
     U64Ext, NATIVE_DENOM,
 };
 
-const CONTRACT_NAME: &str = "crates.io:sg-base-minter";
+const CONTRACT_NAME: &str = env!("CARGO_PKG_NAME");
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 const INSTANTIATE_CW721_REPLY_ID: u64 = 1;
 

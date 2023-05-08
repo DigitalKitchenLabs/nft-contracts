@@ -25,9 +25,8 @@ use cosmwasm_std::Empty;
 // This is a simple type to let us handle empty extensions
 pub type Extension = Option<Empty>;
 
-// Version info for migration
-pub const CONTRACT_NAME: &str = "crates.io:cw721-base";
-pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+const CONTRACT_NAME: &str = env!("CARGO_PKG_NAME");
+const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub mod entry {
     use super::*;
