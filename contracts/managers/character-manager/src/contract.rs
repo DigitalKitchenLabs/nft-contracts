@@ -761,6 +761,7 @@ pub fn update_config(
     Ok(Response::new().add_attribute("action", "update_config"))
 }
 
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: ManagerQueryMsg) -> StdResult<Binary> {
     match msg {
         ManagerQueryMsg::Config {} => to_binary(&query_config(deps)?),
