@@ -382,10 +382,11 @@ pub fn open_lootbox(
     }
 
     let collection_address = COLLECTION_ADDRESS.load(deps.storage)?;
-    let mut current = random_number_1_to_100(
+    let mut current = random_number_1_to_x(
         &env,
         send_to.clone(),
         lootbox_response.lootboxes.len().try_into().unwrap(),
+        100
     );
     let mut position = 0;
 
@@ -533,21 +534,21 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
 //We get around using random libraries by importing the things we need from
 //https://docs.rs/rand/0.8.1/i686-unknown-linux-gnu/src/rand/rngs/xoshiro128plusplus.rs.html
 
-fn random_number_1_to_100(env: &Env, sender: String, array_len: u32) -> u32 {
+fn random_number_1_to_x(env: &Env, sender: String, array_len: u32, x: u32) -> u32 {
     let tx_index = if let Some(tx) = &env.transaction {
         tx.index
     } else {
         0
     };
     let sha256 = Sha256::digest(
-        format!("{}{}{}{}", sender, env.block.height, array_len, tx_index).into_bytes(),
+        format!("{}{}{}{}{}", sender, env.block.time.nanos(), env.block.height, array_len, tx_index).into_bytes(),
     );
     // Cut first 16 bytes from 32 byte value
     let randomness: [u8; 16] = sha256.to_vec()[0..16].try_into().unwrap();
     let mut state = [0; 4];
     read_u32_into(&randomness, &mut state);
     let rng = get_u32(&mut state);
-    let a_number = rng.checked_rem_euclid(100).unwrap() + 1;
+    let a_number = rng.checked_rem_euclid(x).unwrap() + 1;
 
     a_number
 }
