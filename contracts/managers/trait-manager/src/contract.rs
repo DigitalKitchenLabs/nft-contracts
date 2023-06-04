@@ -535,13 +535,8 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
 //https://docs.rs/rand/0.8.1/i686-unknown-linux-gnu/src/rand/rngs/xoshiro128plusplus.rs.html
 
 fn random_number_1_to_x(env: &Env, sender: String, array_len: u32, x: u32) -> u32 {
-    let tx_index = if let Some(tx) = &env.transaction {
-        tx.index
-    } else {
-        0
-    };
     let sha256 = Sha256::digest(
-        format!("{}{}{}{}{}", sender, env.block.time.nanos(), env.block.height, array_len, tx_index).into_bytes(),
+        format!("{}{}{}{}", sender, env.block.time.nanos(), env.block.height, array_len).into_bytes(),
     );
     // Cut first 16 bytes from 32 byte value
     let randomness: [u8; 16] = sha256.to_vec()[0..16].try_into().unwrap();
