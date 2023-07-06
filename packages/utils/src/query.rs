@@ -1,13 +1,26 @@
+use cosmwasm_schema::QueryResponses;
 use cosmwasm_schema::cw_serde;
+use cosmwasm_std::Empty;
 
 use crate::CharacterManagerConfig;
 use crate::CodeId;
 use crate::TraitManagerConfig;
 
 #[cw_serde]
-pub enum ManagerQueryMsg {
-    /// Returns `ParamsResponse`
+#[derive(QueryResponses)]
+pub enum CharacterManagerQueryMsg {
+    #[returns(CharacterManagerConfigResponse<Empty>)]
     Config {},
+    #[returns(AllowedCollectionCodeIdResponse)]
+    AllowedCollectionCodeId {},
+}
+
+#[cw_serde]
+#[derive(QueryResponses)]
+pub enum TraitManagerQueryMsg {
+    #[returns(TraitManagerConfigResponse<Empty>)]
+    Config {},
+    #[returns(AllowedCollectionCodeIdResponse)]
     AllowedCollectionCodeId {},
 }
 

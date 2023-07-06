@@ -18,7 +18,7 @@ use mintables::msg::{QueryMsg, TraitBundlesResp, TraitLootboxesResp, TraitsResp}
 use sha2::{Digest, Sha256};
 use utils::{
     msg::{BaseTraitManagerCreateMsg, UpdateTraitManagerParamsMsg},
-    query::{AllowedCollectionCodeIdResponse, ManagerQueryMsg, TraitManagerConfigResponse},
+    query::{AllowedCollectionCodeIdResponse, TraitManagerQueryMsg, TraitManagerConfigResponse},
     U64Ext, NATIVE_DENOM,
 };
 
@@ -487,10 +487,10 @@ pub fn update_config(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: ManagerQueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env, msg: TraitManagerQueryMsg) -> StdResult<Binary> {
     match msg {
-        ManagerQueryMsg::Config {} => to_binary(&query_config(deps)?),
-        ManagerQueryMsg::AllowedCollectionCodeId {} => to_binary(&query_codeid(deps)?),
+        TraitManagerQueryMsg::Config {} => to_binary(&query_config(deps)?),
+        TraitManagerQueryMsg::AllowedCollectionCodeId {} => to_binary(&query_codeid(deps)?),
     }
 }
 

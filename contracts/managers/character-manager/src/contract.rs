@@ -24,7 +24,7 @@ use mintables::msg::{CharacterBundlesResp, CharacterLootboxesResp, CharactersRes
 use sha2::{Digest, Sha256};
 use utils::{
     msg::{BaseCharacterManagerCreateMsg, UpdateCharacterManagerParamsMsg},
-    query::{AllowedCollectionCodeIdResponse, CharacterManagerConfigResponse, ManagerQueryMsg},
+    query::{AllowedCollectionCodeIdResponse, CharacterManagerConfigResponse, CharacterManagerQueryMsg},
     U64Ext, NATIVE_DENOM,
 };
 
@@ -763,10 +763,10 @@ pub fn update_config(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: ManagerQueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env, msg: CharacterManagerQueryMsg) -> StdResult<Binary> {
     match msg {
-        ManagerQueryMsg::Config {} => to_binary(&query_config(deps)?),
-        ManagerQueryMsg::AllowedCollectionCodeId {} => to_binary(&query_codeid(deps)?),
+        CharacterManagerQueryMsg::Config {} => to_binary(&query_config(deps)?),
+        CharacterManagerQueryMsg::AllowedCollectionCodeId {} => to_binary(&query_codeid(deps)?),
     }
 }
 
